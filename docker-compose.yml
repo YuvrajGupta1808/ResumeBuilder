@@ -1,0 +1,60 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: ai-job-assistant-postgres
+    environment:
+      POSTGRES_DB: ai_job_assistant
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: ai-job-assistant-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ai-job-assistant-backend
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/ai_job_assistant?schema=public
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: your-jwt-secret-here
+      JWT_EXPIRES_IN: 7d
+      OPENAI_API_KEY: your-openai-api-key-here
+      PORT: 3001
+      NODE_ENV: development
+      CORS_ORIGIN: http://localhost:3000
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    command: npm run start:dev
+
+volumes:
+  postgres_data:
+  redis_data:
