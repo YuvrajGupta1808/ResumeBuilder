@@ -1,20 +1,20 @@
 import {
-  Box,
-  Container,
-  Divider,
-  HStack,
-  Link,
-  SimpleGrid,
-  Stack,
-  Text,
-  VStack
+    Box,
+    Container,
+    Divider,
+    HStack,
+    Link,
+    SimpleGrid,
+    Stack,
+    Text,
+    VStack
 } from '@chakra-ui/react';
 import { FiGithub, FiLinkedin, FiMail, FiMapPin, FiPhone, FiTwitter } from 'react-icons/fi';
 
 export function Footer() {
   return (
     <Box bg="gray.900" color="gray.300">
-      <Container maxW="container.xl" py={16}>
+      <Container maxW="container.xl" mx="auto" py={16} className="centered-content">
         <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={8}>
           {/* Company Info */}
           <VStack align="start" spacing={4}>

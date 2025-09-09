@@ -1,19 +1,20 @@
 'use client';
 
-import { api } from '@/lib/api';
+import { useApiClient } from '@/lib/api-client';
 import { Resume } from '@/types';
 import {
-    Badge,
-    Box,
-    Heading,
-    HStack,
-    Text,
-    VStack,
+  Badge,
+  Box,
+  Heading,
+  HStack,
+  Text,
+  VStack,
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { FiCalendar, FiFileText } from 'react-icons/fi';
 
 export function RecentResumes() {
+  const apiClient = useApiClient();
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [loading, setLoading] = useState(true);
   const bg = 'white';
@@ -21,11 +22,11 @@ export function RecentResumes() {
 
   useEffect(() => {
     fetchResumes();
-  }, []);
+  }, [apiClient]);
 
   const fetchResumes = async () => {
     try {
-      const response = await api.get('/resumes');
+      const response = await apiClient.get('/resumes');
       setResumes(response.data.slice(0, 5)); // Show only recent 5
     } catch (error) {
       console.error('Error fetching resumes:', error);

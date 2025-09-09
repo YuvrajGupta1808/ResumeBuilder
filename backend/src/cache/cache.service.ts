@@ -8,15 +8,28 @@ export class CacheService {
     private client: RedisClientType;
 
     constructor(private configService: ConfigService) {
+        const redisUrl = this.configService.get('REDIS_URL');
+
+        // Convert redis:// to rediss:// for Upstash TLS connection
+        const tlsRedisUrl = redisUrl.startsWith('redis://')
+            ? redisUrl.replace('redis://', 'rediss://')
+            : redisUrl;
+
         this.client = createClient({
-            url: this.configService.get('REDIS_URL'),
+            url: tlsRedisUrl,
         });
 
         this.client.on('error', (err) => {
             this.logger.error('Redis Client Error:', err);
         });
 
-        this.client.connect();
+        this.client.on('connect', () => {
+            this.logger.log('Connected to Redis successfully');
+        });
+
+        this.client.connect().catch((err) => {
+            this.logger.error('Failed to connect to Redis:', err);
+        });
     }
 
     async get(key: string): Promise<string | null> {

@@ -1,26 +1,24 @@
 import { CoverLetter } from '@/components/CoverLetter';
 import { Navbar } from '@/components/Navbar';
-import { Sidebar } from '@/components/Sidebar';
 import { TailoredResume } from '@/components/TailoredResume';
 import {
-    Alert,
-    AlertDescription,
-    AlertIcon,
-    AlertTitle,
-    Badge,
-    Box,
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    Button,
-    Container,
-    Divider,
-    Heading,
-    HStack,
-    Icon,
-    SimpleGrid,
-    Text,
-    VStack,
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  AlertTitle,
+  Badge,
+  Box,
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  Button,
+  Container,
+  Divider,
+  Heading,
+  HStack,
+  SimpleGrid,
+  Text,
+  VStack
 } from '@chakra-ui/react';
 import { FiCheckCircle, FiDownload, FiEdit, FiHome, FiShare, FiStar } from 'react-icons/fi';
 
@@ -29,7 +27,6 @@ export default function ResultsPage() {
     <Box bg="gray.50" minH="100vh">
       <Navbar />
       <Box display="flex">
-        <Sidebar />
         <Box flex="1" p={8}>
           <Container maxW="container.xl">
             <VStack align="start" spacing={8}>

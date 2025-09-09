@@ -1,6 +1,6 @@
 'use client';
 
-import { api } from '@/lib/api';
+import { useApiClient } from '@/lib/api-client';
 import {
     Box,
     SimpleGrid,
@@ -9,7 +9,6 @@ import {
     StatHelpText,
     StatLabel,
     StatNumber,
-    
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 
@@ -21,6 +20,7 @@ interface Stats {
 }
 
 export function StatsCards() {
+  const apiClient = useApiClient();
   const [stats, setStats] = useState<Stats>({
     totalResumes: 0,
     totalApplications: 0,
@@ -33,11 +33,11 @@ export function StatsCards() {
 
   useEffect(() => {
     fetchStats();
-  }, []);
+  }, [apiClient]);
 
   const fetchStats = async () => {
     try {
-      const response = await api.get('/user/stats');
+      const response = await apiClient.get('/user/stats');
       setStats(response.data);
     } catch (error) {
       console.error('Error fetching stats:', error);

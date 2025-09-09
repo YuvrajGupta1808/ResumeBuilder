@@ -18,7 +18,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     async validate(payload: any) {
-        const user = await this.authService.validateToken(payload.access_token);
+        // The payload contains the decoded JWT with email and sub (user id)
+        const user = await this.authService.validateUser(payload.email);
         if (!user) {
             throw new UnauthorizedException();
         }

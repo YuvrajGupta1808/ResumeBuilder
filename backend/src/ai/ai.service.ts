@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import * as crypto from 'crypto';
 import OpenAI from 'openai';
 import { CacheService } from '../cache/cache.service';
 import { JobService } from '../job/job.service';
@@ -32,7 +33,8 @@ export class AiService {
         }
 
         // Check cache first
-        const cacheKey = `tailor:${resumeId}:${Buffer.from(jobDescription).toString('base64').slice(0, 50)}`;
+        const jobDescHash = crypto.createHash('sha256').update(jobDescription).digest('hex').slice(0, 16);
+        const cacheKey = `tailor:${resumeId}:${jobDescHash}`;
         const cached = await this.cacheService.get(cacheKey);
         if (cached) {
             this.logger.log('Returning cached result');

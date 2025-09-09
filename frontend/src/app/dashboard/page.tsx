@@ -1,7 +1,8 @@
+'use client';
+
 import { Navbar } from '@/components/Navbar';
 import { QuickActions } from '@/components/QuickActions';
 import { RecentResumes } from '@/components/RecentResumes';
-import { Sidebar } from '@/components/Sidebar';
 import { StatsCards } from '@/components/StatsCards';
 import {
     Badge,
@@ -14,20 +15,20 @@ import {
     GridItem,
     Heading,
     HStack,
-    Icon,
     Text,
-    VStack,
+    VStack
 } from '@chakra-ui/react';
+import { useSession } from 'next-auth/react';
 import { FiCalendar, FiHome, FiTrendingUp } from 'react-icons/fi';
 
 export default function DashboardPage() {
+  const { data: session } = useSession();
+  
   return (
     <Box bg="gray.50" minH="100vh">
       <Navbar />
-      <HStack align="start" spacing={0}>
-        <Sidebar />
-        <Box flex="1" p={8}>
-          <Container maxW="container.xl">
+      <Box p={8}>
+          <Container maxW="container.xl" mx="auto" className="centered-content">
             <VStack align="start" spacing={8}>
               {/* Header Section */}
               <Box w="full">
@@ -58,7 +59,7 @@ export default function DashboardPage() {
                       Dashboard
                     </Heading>
                     <Text color="gray.600" fontSize="lg">
-                      Welcome back! Here's your job application overview and insights.
+                      Welcome back{session?.user?.name ? `, ${session.user.name.split(' ')[0]}` : ''}! Here's your job application overview and insights.
                     </Text>
                   </VStack>
                   
@@ -112,8 +113,7 @@ export default function DashboardPage() {
               </Grid>
             </VStack>
           </Container>
-        </Box>
-      </HStack>
+      </Box>
     </Box>
   );
 }

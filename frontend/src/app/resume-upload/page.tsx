@@ -1,6 +1,5 @@
 import { Navbar } from '@/components/Navbar';
 import { ResumeUploadForm } from '@/components/ResumeUploadForm';
-import { Sidebar } from '@/components/Sidebar';
 import {
   Alert,
   AlertDescription,
@@ -14,21 +13,19 @@ import {
   Container,
   Heading,
   HStack,
-  Icon,
   Text,
-  VStack,
+  VStack
 } from '@chakra-ui/react';
 import { FiCheck, FiHome, FiShield, FiUpload } from 'react-icons/fi';
 
 export default function ResumeUploadPage() {
   return (
-    <Box bg="gray.50" minH="100vh">
+    <Box bg="linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)" minH="100vh">
       <Navbar />
       <Box display="flex">
-        <Sidebar />
         <Box flex="1" p={8}>
-          <Container maxW="container.lg">
-            <VStack align="start" spacing={8}>
+          <Container maxW="container.lg" mx="auto" className="centered-content">
+            <VStack align="start" spacing={8} className="fade-in">
               {/* Header Section */}
               <Box w="full">
                 <Breadcrumb mb={4}>
@@ -53,26 +50,42 @@ export default function ResumeUploadPage() {
                 </Breadcrumb>
                 
                 <HStack justify="space-between" align="start" mb={6}>
-                  <VStack align="start" spacing={3}>
-                    <HStack spacing={3} align="center">
+                  <VStack align="start" spacing={3} className="slide-in-left">
+                    <HStack spacing={4} align="center">
                       <Box
-                        p={3}
-                        bg="brand.100"
-                        borderRadius="xl"
+                        p={4}
+                        bg="linear-gradient(135deg, rgba(0, 136, 255, 0.1), rgba(0, 136, 255, 0.2))"
+                        borderRadius="2xl"
                         color="brand.600"
+                        border="2px solid"
+                        borderColor="rgba(0, 136, 255, 0.2)"
+                        boxShadow="0 8px 25px rgba(0, 136, 255, 0.15)"
+                        sx={{
+                          transition: 'all 0.3s ease',
+                          '&:hover': {
+                            transform: 'translateY(-2px) scale(1.05)',
+                            boxShadow: '0 15px 35px rgba(0, 136, 255, 0.25)',
+                          },
+                        }}
                       >
-                        <FiUpload size={24} />
+                        <FiUpload size={28} />
                       </Box>
-                      <VStack align="start" spacing={1}>
+                      <VStack align="start" spacing={2}>
                         <Heading 
                           size="xl" 
-                          fontWeight={700}
-                          bgGradient="linear(to-r, gray.800, brand.600)"
-                          bgClip="text"
+                          fontWeight={800}
+                          sx={{
+                            background: 'linear-gradient(135deg, #1a202c 0%, #0088ff 70%, #005899 100%)',
+                            backgroundClip: 'text',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            backgroundSize: '200% 200%',
+                            animation: 'gradientShift 8s ease infinite',
+                          }}
                         >
                           Upload Resume
                         </Heading>
-                        <Text color="gray.600" fontSize="lg">
+                        <Text color="gray.600" fontSize="lg" fontWeight="500" lineHeight="1.6">
                           Upload your resume to get started with AI-powered job application assistance.
                         </Text>
                       </VStack>
@@ -80,14 +93,28 @@ export default function ResumeUploadPage() {
                   </VStack>
                   
                   <Badge
-                    colorScheme="blue"
-                    px={3}
-                    py={1}
+                    bg="rgba(0, 136, 255, 0.1)"
+                    color="brand.700"
+                    px={4}
+                    py={2}
                     borderRadius="full"
                     fontSize="sm"
+                    fontWeight="600"
+                    border="1px solid"
+                    borderColor="rgba(0, 136, 255, 0.2)"
+                    boxShadow="0 4px 12px rgba(0, 136, 255, 0.1)"
+                    className="scale-in"
+                    sx={{
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        transform: 'translateY(-2px) scale(1.02)',
+                        boxShadow: '0 8px 20px rgba(0, 136, 255, 0.2)',
+                        bg: 'rgba(0, 136, 255, 0.15)',
+                      },
+                    }}
                   >
-                    <HStack spacing={1}>
-                      <FiShield size={12} />
+                    <HStack spacing={2}>
+                      <FiShield size={14} />
                       <Text>Secure Upload</Text>
                     </HStack>
                   </Badge>
@@ -95,13 +122,29 @@ export default function ResumeUploadPage() {
               </Box>
 
               {/* Info Alert */}
-              <Alert status="info" borderRadius="xl" bg="blue.50" border="1px" borderColor="blue.200">
-                <AlertIcon color="blue.500" />
+              <Alert 
+                status="info" 
+                borderRadius="2xl" 
+                bg="rgba(59, 130, 246, 0.05)" 
+                border="1px" 
+                borderColor="rgba(59, 130, 246, 0.2)"
+                boxShadow="0 8px 25px rgba(59, 130, 246, 0.1)"
+                className="slide-in-right"
+                sx={{
+                  backdropFilter: 'blur(10px)',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 15px 35px rgba(59, 130, 246, 0.15)',
+                  },
+                }}
+              >
+                <AlertIcon color="blue.500" boxSize="18px" />
                 <Box>
-                  <AlertTitle color="blue.800" fontSize="sm" fontWeight="semibold">
+                  <AlertTitle color="blue.800" fontSize="sm" fontWeight="700">
                     Supported Formats
                   </AlertTitle>
-                  <AlertDescription color="blue.700" fontSize="sm">
+                  <AlertDescription color="blue.700" fontSize="sm" fontWeight="500">
                     We support PDF, DOC, and DOCX files up to 10MB. Your resume will be processed securely and privately.
                   </AlertDescription>
                 </Box>
@@ -109,12 +152,22 @@ export default function ResumeUploadPage() {
 
               {/* Features */}
               <Box
-                bg="white"
-                p={6}
-                borderRadius="xl"
+                bg="rgba(255, 255, 255, 0.9)"
+                backdropFilter="blur(20px)"
+                p={8}
+                borderRadius="2xl"
                 border="1px"
-                borderColor="gray.200"
+                borderColor="rgba(0, 136, 255, 0.1)"
                 w="full"
+                boxShadow="0 20px 40px rgba(0, 0, 0, 0.08)"
+                className="card-modern"
+                sx={{
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: '0 32px 64px rgba(0, 0, 0, 0.12)',
+                  },
+                }}
               >
                 <VStack spacing={4} align="start">
                   <Heading size="md" color="gray.800">
@@ -123,12 +176,17 @@ export default function ResumeUploadPage() {
                   <VStack spacing={3} align="start" w="full">
                     <HStack spacing={3}>
                       <Box
-                        p={2}
+                        p={1.5}
                         bg="green.100"
-                        borderRadius="lg"
+                        borderRadius="md"
                         color="green.600"
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                        minW={6}
+                        h={6}
                       >
-                        <FiCheck size={16} />
+                        <FiCheck size={12} />
                       </Box>
                       <Text fontSize="sm" color="gray.600">
                         AI analyzes your skills, experience, and qualifications
@@ -136,12 +194,17 @@ export default function ResumeUploadPage() {
                     </HStack>
                     <HStack spacing={3}>
                       <Box
-                        p={2}
+                        p={1.5}
                         bg="green.100"
-                        borderRadius="lg"
+                        borderRadius="md"
                         color="green.600"
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                        minW={6}
+                        h={6}
                       >
-                        <FiCheck size={16} />
+                        <FiCheck size={12} />
                       </Box>
                       <Text fontSize="sm" color="gray.600">
                         Extract key information for job matching
@@ -149,12 +212,17 @@ export default function ResumeUploadPage() {
                     </HStack>
                     <HStack spacing={3}>
                       <Box
-                        p={2}
+                        p={1.5}
                         bg="green.100"
-                        borderRadius="lg"
+                        borderRadius="md"
                         color="green.600"
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                        minW={6}
+                        h={6}
                       >
-                        <FiCheck size={16} />
+                        <FiCheck size={12} />
                       </Box>
                       <Text fontSize="sm" color="gray.600">
                         Ready for AI-powered resume tailoring
@@ -165,7 +233,24 @@ export default function ResumeUploadPage() {
               </Box>
               
               {/* Upload Form */}
-              <Box w="full">
+              <Box 
+                w="full"
+                bg="rgba(255, 255, 255, 0.9)"
+                backdropFilter="blur(20px)"
+                p={8}
+                borderRadius="2xl"
+                border="1px"
+                borderColor="rgba(0, 136, 255, 0.1)"
+                boxShadow="0 20px 40px rgba(0, 0, 0, 0.08)"
+                className="card-modern scale-in"
+                sx={{
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 25px 50px rgba(0, 0, 0, 0.1)',
+                  },
+                }}
+              >
                 <ResumeUploadForm />
               </Box>
             </VStack>
