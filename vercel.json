@@ -1,0 +1,9 @@
+{
+    "version": 2,
+    "buildCommand": "cd frontend && npm run build",
+    "outputDirectory": "frontend/.next",
+    "installCommand": "cd frontend && npm install",
+    "env": {
+        "NEXT_PUBLIC_API_URL": "https://resume-builder-backend.happyground-25b79e78.eastus.azurecontainerapps.io"
+    }
+}
