@@ -14,7 +14,7 @@ import {
 } from '@chakra-ui/react';
 import jsPDF from 'jspdf';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { FiCopy, FiDownload, FiEdit } from 'react-icons/fi';
 
 export function CoverLetter() {
@@ -27,13 +27,7 @@ export function CoverLetter() {
   const bg = 'white';
   const borderColor = 'gray.200';
 
-  useEffect(() => {
-    if (jobHistoryId) {
-      fetchJobHistory();
-    }
-  }, [jobHistoryId]);
-
-  const fetchJobHistory = async () => {
+  const fetchJobHistory = useCallback(async () => {
     try {
       const response = await api.get(`/job-history/${jobHistoryId}`);
       setJobHistory(response.data);
@@ -42,7 +36,13 @@ export function CoverLetter() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [jobHistoryId]);
+
+  useEffect(() => {
+    if (jobHistoryId) {
+      fetchJobHistory();
+    }
+  }, [jobHistoryId, fetchJobHistory]);
 
   const handleDownloadPDF = async () => {
     if (!jobHistory) return;

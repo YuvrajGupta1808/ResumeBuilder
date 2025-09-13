@@ -8,9 +8,16 @@
         "dev:frontend": "cd frontend && npm run dev",
         "build": "cd frontend && npm run build",
         "start": "cd frontend && npm start",
-        "deploy:frontend": "cd frontend && npx vercel --prod"
+        "deploy:frontend": "cd frontend && npx vercel --prod",
+        "lint": "npm run lint:frontend && npm run lint:backend",
+        "lint:frontend": "cd frontend && npm run lint",
+        "lint:backend": "cd backend && npm run lint"
     },
     "devDependencies": {
-        "concurrently": "^7.6.0"
+        "@typescript-eslint/eslint-plugin": "^8.43.0",
+        "@typescript-eslint/parser": "^8.43.0",
+        "concurrently": "^7.6.0",
+        "eslint": "^9.35.0",
+        "eslint-config-next": "^15.5.3"
     }
 }

@@ -1,3 +1,5 @@
+'use client';
+
 import { CoverLetter } from '@/components/CoverLetter';
 import { Navbar } from '@/components/Navbar';
 import { TailoredResume } from '@/components/TailoredResume';
@@ -68,7 +70,7 @@ export default function ResultsPage() {
                         <Heading 
                           size="xl" 
                           fontWeight={700}
-                          bg="linear(to-r, gray.800, brand.600)"
+                          bg="linear-gradient(to right, #1a202c, #805ad5)"
                           bgClip="text"
                         >
                           Tailored Results
@@ -143,7 +145,7 @@ export default function ResultsPage() {
                     </Button>
                     <Button
                       leftIcon={<FiDownload />}
-                      bg="linear(to-r, brand.400, brand.600)"
+                      bg="linear-gradient(to right, #9f7aea, #805ad5)"
                       color="white"
                       onClick={() => {
                         const jobHistoryId = new URLSearchParams(window.location.search).get('jobHistoryId');
@@ -152,7 +154,7 @@ export default function ResultsPage() {
                         }
                       }}
                       _hover={{
-                        bg: "linear(to-r, brand.500, brand.700)",
+                        bg: "linear-gradient(to right, #8b5cf6, #7c3aed)",
                         transform: "translateY(-1px)",
                         boxShadow: "lg",
                       }}

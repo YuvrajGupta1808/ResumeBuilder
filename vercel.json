@@ -4,6 +4,6 @@
     "outputDirectory": "frontend/.next",
     "installCommand": "cd frontend && npm install",
     "env": {
-        "NEXT_PUBLIC_API_URL": "https://resume-builder-backend.happyground-25b79e78.eastus.azurecontainerapps.io"
+        "NEXT_PUBLIC_API_URL": "https://resumebuilder-production-04d5.up.railway.app"
     }
 }

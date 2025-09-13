@@ -19,7 +19,7 @@ import {
 } from '@chakra-ui/react';
 import jsPDF from 'jspdf';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { FiCheckCircle, FiDownload, FiEye, FiFileText, FiStar } from 'react-icons/fi';
 
 export function DownloadPageContent() {
@@ -31,15 +31,7 @@ export function DownloadPageContent() {
   const toast = useToast();
   const apiClient = useApiClient();
 
-  useEffect(() => {
-    if (jobHistoryId) {
-      fetchJobHistory();
-    } else {
-      setLoading(false);
-    }
-  }, [jobHistoryId]);
-
-  const fetchJobHistory = async () => {
+  const fetchJobHistory = useCallback(async () => {
     try {
       console.log('Fetching job history for ID:', jobHistoryId);
       const response = await apiClient.get(`/job-history/${jobHistoryId}`);
@@ -63,7 +55,15 @@ export function DownloadPageContent() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [jobHistoryId, apiClient, toast]);
+
+  useEffect(() => {
+    if (jobHistoryId) {
+      fetchJobHistory();
+    } else {
+      setLoading(false);
+    }
+  }, [jobHistoryId, fetchJobHistory]);
 
   const generatePDF = (content: string, filename: string, title: string) => {
     const doc = new jsPDF();

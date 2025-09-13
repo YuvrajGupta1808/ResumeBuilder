@@ -190,7 +190,7 @@ export function Navbar() {
                 transition="all 0.2s ease"
               >
                 <Avatar
-                  size="sm"
+                  size={"28px"}
                   src={session.user?.image || ''}
                   border="2px solid"
                   borderColor="brand.200"
