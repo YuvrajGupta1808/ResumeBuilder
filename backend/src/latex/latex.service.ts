@@ -364,7 +364,7 @@ Sincerely,
             const extractedText = data.text.trim();
 
             // Parse the extracted text and convert to LaTeX format
-            const parsedData = this.parseResumeContent(extractedText);
+            const _parsedData = this.parseResumeContent(extractedText);
 
             // Generate LaTeX using the template
             return this.generateResumeLatex({ content: extractedText });

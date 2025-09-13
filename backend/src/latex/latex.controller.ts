@@ -122,7 +122,7 @@ export class LatexController {
     @UseInterceptors(FileInterceptor('file'))
     @ApiConsumes('multipart/form-data')
     @ApiOperation({ summary: 'Convert PDF file to LaTeX format' })
-    async convertPdfToLatex(@UploadedFile() file: Express.Multer.File, @Request() req) {
+    async convertPdfToLatex(@UploadedFile() file: Express.Multer.File, @Request() _req) {
         try {
             if (!file) {
                 return { success: false, error: 'No file uploaded' };
@@ -210,7 +210,7 @@ export class LatexController {
     @UseInterceptors(FileInterceptor('file'))
     @ApiConsumes('multipart/form-data')
     @ApiOperation({ summary: 'Upload and process LaTeX file' })
-    async uploadLatex(@UploadedFile() file: Express.Multer.File, @Request() req) {
+    async uploadLatex(@UploadedFile() file: Express.Multer.File, @Request() _req) {
         try {
             if (!file) {
                 return { success: false, error: 'No file uploaded' };
@@ -252,7 +252,7 @@ export class LatexController {
 
     @Post('compile-docker')
     @ApiOperation({ summary: 'Compile LaTeX to PDF using Docker' })
-    async compileLatexWithDocker(@Body() body: { latexContent: string }, @Request() req) {
+    async compileLatexWithDocker(@Body() body: { latexContent: string }, @Request() _req) {
         try {
             const pdfBuffer = await this.dockerLatexService.compileLatexToPdf(body.latexContent);
             return {
@@ -270,7 +270,7 @@ export class LatexController {
 
     @Post('test-docker')
     @ApiOperation({ summary: 'Test Docker LaTeX compilation' })
-    async testDockerCompilation(@Request() req) {
+    async testDockerCompilation(@Request() _req) {
         try {
             const success = await this.dockerLatexService.testCompilation();
             return {
