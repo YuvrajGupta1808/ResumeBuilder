@@ -48,17 +48,17 @@ export function StatsCards() {
 
   if (loading) {
     return (
-      <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={6} w="full">
+      <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={6} w='full'>
         {[...Array(4)].map((_, i) => (
           <Box
             key={i}
             bg={bg}
-            border="1px"
+            border='1px'
             borderColor={borderColor}
-            borderRadius="lg"
+            borderRadius='lg'
             p={4}
           >
-            <Box h="20" bg="gray.200" borderRadius="md" />
+            <Box h='20' bg='gray.200' borderRadius='md' />
           </Box>
         ))}
       </SimpleGrid>
@@ -66,19 +66,19 @@ export function StatsCards() {
   }
 
   return (
-    <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={6} w="full">
+    <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={6} w='full'>
       <Box
         bg={bg}
-        border="1px"
+        border='1px'
         borderColor={borderColor}
-        borderRadius="lg"
+        borderRadius='lg'
         p={4}
       >
         <Stat>
           <StatLabel>Total Resumes</StatLabel>
           <StatNumber>{stats.totalResumes}</StatNumber>
-          <StatHelpText fontSize="xs">
-            <StatArrow type="increase" boxSize="6px" />
+          <StatHelpText fontSize='xs'>
+            <StatArrow type='increase' boxSize='6px' />
             Active resumes
           </StatHelpText>
         </Stat>
@@ -86,16 +86,16 @@ export function StatsCards() {
 
       <Box
         bg={bg}
-        border="1px"
+        border='1px'
         borderColor={borderColor}
-        borderRadius="lg"
+        borderRadius='lg'
         p={4}
       >
         <Stat>
           <StatLabel>Applications Sent</StatLabel>
           <StatNumber>{stats.totalApplications}</StatNumber>
-          <StatHelpText fontSize="xs">
-            <StatArrow type="increase" boxSize="6px" />
+          <StatHelpText fontSize='xs'>
+            <StatArrow type='increase' boxSize='6px' />
             This month: {stats.thisMonthApplications}
           </StatHelpText>
         </Stat>
@@ -103,16 +103,16 @@ export function StatsCards() {
 
       <Box
         bg={bg}
-        border="1px"
+        border='1px'
         borderColor={borderColor}
-        borderRadius="lg"
+        borderRadius='lg'
         p={4}
       >
         <Stat>
           <StatLabel>Success Rate</StatLabel>
           <StatNumber>{stats.successRate}%</StatNumber>
-          <StatHelpText fontSize="xs">
-            <StatArrow type="increase" boxSize="6px" />
+          <StatHelpText fontSize='xs'>
+            <StatArrow type='increase' boxSize='6px' />
             Response rate
           </StatHelpText>
         </Stat>
@@ -120,16 +120,16 @@ export function StatsCards() {
 
       <Box
         bg={bg}
-        border="1px"
+        border='1px'
         borderColor={borderColor}
-        borderRadius="lg"
+        borderRadius='lg'
         p={4}
       >
         <Stat>
           <StatLabel>Time Saved</StatLabel>
           <StatNumber>24h</StatNumber>
-          <StatHelpText fontSize="xs">
-            <StatArrow type="increase" boxSize="6px" />
+          <StatHelpText fontSize='xs'>
+            <StatArrow type='increase' boxSize='6px' />
             This month
           </StatHelpText>
         </Stat>

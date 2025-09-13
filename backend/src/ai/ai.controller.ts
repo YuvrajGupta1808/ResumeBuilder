@@ -9,11 +9,11 @@ import { TailorResumeDto } from './dto/tailor-resume.dto';
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class AiController {
-    constructor(private readonly aiService: AiService) { }
+  constructor(private readonly aiService: AiService) {}
 
-    @Post('tailor-resume')
-    @ApiOperation({ summary: 'Tailor resume and generate cover letter' })
-    async tailorResume(@Body() tailorResumeDto: TailorResumeDto, @Request() req) {
-        return this.aiService.tailorResume(tailorResumeDto, req.user.id);
-    }
+  @Post('tailor-resume')
+  @ApiOperation({ summary: 'Tailor resume and generate cover letter' })
+  async tailorResume(@Body() tailorResumeDto: TailorResumeDto, @Request() req) {
+    return this.aiService.tailorResume(tailorResumeDto, req.user.id);
+  }
 }

@@ -20,7 +20,13 @@
         "build:backend": "cd backend && npm run build",
         "test:all": "npm run test:frontend && npm run test:backend",
         "test:frontend": "cd frontend && npm run test",
-        "test:backend": "cd backend && npm run test"
+        "test:backend": "cd backend && npm run test",
+        "format:check": "npm run format:check:frontend && npm run format:check:backend",
+        "format:check:frontend": "cd frontend && npm run format:check",
+        "format:check:backend": "cd backend && npm run format:check",
+        "format:all": "npm run format:frontend && npm run format:backend",
+        "format:frontend": "cd frontend && npm run format",
+        "format:backend": "cd backend && npm run format"
     },
     "devDependencies": {
         "@typescript-eslint/eslint-plugin": "^8.43.0",

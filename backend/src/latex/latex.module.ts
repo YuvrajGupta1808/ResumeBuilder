@@ -4,8 +4,8 @@ import { LatexController } from './latex.controller';
 import { LatexService } from './latex.service';
 
 @Module({
-    providers: [LatexService, DockerLatexService],
-    controllers: [LatexController],
-    exports: [LatexService, DockerLatexService],
+  providers: [LatexService, DockerLatexService],
+  controllers: [LatexController],
+  exports: [LatexService, DockerLatexService],
 })
-export class LatexModule { }
+export class LatexModule {}

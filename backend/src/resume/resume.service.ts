@@ -6,41 +6,49 @@ import { UpdateResumeDto } from './dto/update-resume.dto';
 
 @Injectable()
 export class ResumeService {
-    constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
-    async create(createResumeDto: CreateResumeDto, userId: string): Promise<Resume> {
-        return this.prisma.resume.create({
-            data: {
-                ...createResumeDto,
-                originalContent: createResumeDto.originalContent || createResumeDto.content,
-                userId,
-            },
-        });
-    }
+  async create(
+    createResumeDto: CreateResumeDto,
+    userId: string
+  ): Promise<Resume> {
+    return this.prisma.resume.create({
+      data: {
+        ...createResumeDto,
+        originalContent:
+          createResumeDto.originalContent || createResumeDto.content,
+        userId,
+      },
+    });
+  }
 
-    async findAll(userId: string): Promise<Resume[]> {
-        return this.prisma.resume.findMany({
-            where: { userId },
-            orderBy: { createdAt: 'desc' },
-        });
-    }
+  async findAll(userId: string): Promise<Resume[]> {
+    return this.prisma.resume.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
 
-    async findOne(id: string, userId: string): Promise<Resume | null> {
-        return this.prisma.resume.findFirst({
-            where: { id, userId },
-        });
-    }
+  async findOne(id: string, userId: string): Promise<Resume | null> {
+    return this.prisma.resume.findFirst({
+      where: { id, userId },
+    });
+  }
 
-    async update(id: string, updateResumeDto: UpdateResumeDto, userId: string): Promise<Resume> {
-        return this.prisma.resume.update({
-            where: { id, userId },
-            data: updateResumeDto,
-        });
-    }
+  async update(
+    id: string,
+    updateResumeDto: UpdateResumeDto,
+    userId: string
+  ): Promise<Resume> {
+    return this.prisma.resume.update({
+      where: { id, userId },
+      data: updateResumeDto,
+    });
+  }
 
-    async remove(id: string, userId: string): Promise<Resume> {
-        return this.prisma.resume.delete({
-            where: { id, userId },
-        });
-    }
+  async remove(id: string, userId: string): Promise<Resume> {
+    return this.prisma.resume.delete({
+      where: { id, userId },
+    });
+  }
 }

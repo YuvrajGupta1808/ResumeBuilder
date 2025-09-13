@@ -3,14 +3,14 @@
 import { api } from '@/lib/api';
 import { JobHistory } from '@/types';
 import {
-    Box,
-    Button,
-    Divider,
-    Heading,
-    HStack,
-    Text,
-    useToast,
-    VStack,
+  Box,
+  Button,
+  Divider,
+  Heading,
+  HStack,
+  Text,
+  useToast,
+  VStack,
 } from '@chakra-ui/react';
 import jsPDF from 'jspdf';
 import { useSearchParams } from 'next/navigation';
@@ -46,30 +46,34 @@ export function CoverLetter() {
 
   const handleDownloadPDF = async () => {
     if (!jobHistory) return;
-    
+
     setDownloading(true);
     try {
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.getWidth();
       const pageHeight = doc.internal.pageSize.getHeight();
       const margin = 20;
-      const maxWidth = pageWidth - (margin * 2);
-      
+      const maxWidth = pageWidth - margin * 2;
+
       // Add title
       doc.setFontSize(18);
       doc.setFont('helvetica', 'bold');
       doc.text('Cover Letter', margin, margin + 10);
-      
+
       // Add job info
       doc.setFontSize(12);
       doc.setFont('helvetica', 'normal');
-      doc.text(`${jobHistory.jobTitle} at ${jobHistory.company}`, margin, margin + 25);
-      
+      doc.text(
+        `${jobHistory.jobTitle} at ${jobHistory.company}`,
+        margin,
+        margin + 25
+      );
+
       // Add content
       doc.setFontSize(10);
       const lines = doc.splitTextToSize(jobHistory.coverLetter, maxWidth);
       let yPosition = margin + 40;
-      
+
       lines.forEach((line: string) => {
         if (yPosition > pageHeight - margin) {
           doc.addPage();
@@ -78,9 +82,9 @@ export function CoverLetter() {
         doc.text(line, margin, yPosition);
         yPosition += 6;
       });
-      
+
       doc.save(`${jobHistory.jobTitle}-cover-letter.pdf`);
-      
+
       toast({
         title: 'Cover letter downloaded!',
         description: 'Your cover letter has been downloaded as a PDF.',
@@ -125,9 +129,9 @@ export function CoverLetter() {
     return (
       <Box
         bg={bg}
-        border="1px"
+        border='1px'
         borderColor={borderColor}
-        borderRadius="lg"
+        borderRadius='lg'
         p={6}
       >
         <Text>Loading cover letter...</Text>
@@ -139,9 +143,9 @@ export function CoverLetter() {
     return (
       <Box
         bg={bg}
-        border="1px"
+        border='1px'
         borderColor={borderColor}
-        borderRadius="lg"
+        borderRadius='lg'
         p={6}
       >
         <Text>No cover letter data found.</Text>
@@ -150,51 +154,41 @@ export function CoverLetter() {
   }
 
   return (
-    <Box
-      bg={bg}
-      border="1px"
-      borderColor={borderColor}
-      borderRadius="lg"
-      p={6}
-    >
-      <VStack align="start" spacing={4}>
-        <HStack justify="space-between" w="full">
+    <Box bg={bg} border='1px' borderColor={borderColor} borderRadius='lg' p={6}>
+      <VStack align='start' spacing={4}>
+        <HStack justify='space-between' w='full'>
           <Box>
-            <Heading size="md">Cover Letter</Heading>
-            <Text fontSize="sm" color="gray.500">
+            <Heading size='md'>Cover Letter</Heading>
+            <Text fontSize='sm' color='gray.500'>
               {jobHistory.jobTitle} at {jobHistory.company}
             </Text>
           </Box>
           <HStack>
             <Button
               leftIcon={<FiCopy />}
-              variant="outline"
-              size="sm"
+              variant='outline'
+              size='sm'
               onClick={handleCopy}
             >
               Copy
             </Button>
-            <Button
-              leftIcon={<FiEdit />}
-              variant="outline"
-              size="sm"
-            >
+            <Button leftIcon={<FiEdit />} variant='outline' size='sm'>
               Edit
             </Button>
             <Button
               leftIcon={<FiDownload />}
-              colorScheme="green"
-              size="sm"
+              colorScheme='green'
+              size='sm'
               onClick={handleDownloadPDF}
               isLoading={downloading}
-              loadingText="Generating..."
+              loadingText='Generating...'
             >
               PDF
             </Button>
             <Button
               leftIcon={<FiDownload />}
-              variant="outline"
-              size="sm"
+              variant='outline'
+              size='sm'
               onClick={handleDownloadTXT}
             >
               TXT
@@ -205,18 +199,14 @@ export function CoverLetter() {
         <Divider />
 
         <Box
-          w="full"
+          w='full'
           p={4}
-          bg="gray.50"
-          borderRadius="md"
-          maxH="600px"
-          overflowY="auto"
+          bg='gray.50'
+          borderRadius='md'
+          maxH='600px'
+          overflowY='auto'
         >
-          <Text
-            whiteSpace="pre-wrap"
-            fontSize="sm"
-            lineHeight="1.6"
-          >
+          <Text whiteSpace='pre-wrap' fontSize='sm' lineHeight='1.6'>
             {jobHistory.coverLetter}
           </Text>
         </Box>

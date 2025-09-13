@@ -4,7 +4,7 @@ import * as pdfParse from 'pdf-parse';
 
 @Injectable()
 export class LatexService {
-    private readonly resumeTemplate = `\\documentclass[11pt,a4paper]{article}
+  private readonly resumeTemplate = `\\documentclass[11pt,a4paper]{article}
 \\usepackage[utf8]{inputenc}
 \\usepackage[margin=0.75in]{geometry}
 \\usepackage{enumitem}
@@ -89,7 +89,7 @@ export class LatexService {
 
 \\end{document}`;
 
-    private readonly coverLetterTemplate = `\\documentclass[11pt,a4paper]{article}
+  private readonly coverLetterTemplate = `\\documentclass[11pt,a4paper]{article}
 \\usepackage[utf8]{inputenc}
 \\usepackage[margin=1in]{geometry}
 \\usepackage{enumitem}
@@ -147,354 +147,371 @@ Sincerely,
 
 \\end{document}`;
 
-    generateResumeLatex(resumeData: any): string {
-        const template = Handlebars.compile(this.resumeTemplate);
+  generateResumeLatex(resumeData: any): string {
+    const template = Handlebars.compile(this.resumeTemplate);
 
-        // Parse the resume content to extract structured data
-        const parsedData = this.parseResumeContent(resumeData.content);
+    // Parse the resume content to extract structured data
+    const parsedData = this.parseResumeContent(resumeData.content);
 
-        return template(parsedData);
+    return template(parsedData);
+  }
+
+  generateCoverLetterLatex(coverLetterData: any, resumeData: any): string {
+    const template = Handlebars.compile(this.coverLetterTemplate);
+
+    // Parse the resume content to extract contact info
+    const parsedResume = this.parseResumeContent(resumeData.content);
+
+    const data = {
+      name: parsedResume.name,
+      email: parsedResume.email,
+      phone: parsedResume.phone,
+      location: parsedResume.location,
+      company: coverLetterData.company,
+      hiringManager: coverLetterData.hiringManager || '',
+      body: this.formatCoverLetterBody(coverLetterData.content),
+    };
+
+    return template(data);
+  }
+
+  private parseResumeContent(content: string): any {
+    const lines = content.split('\\n');
+    let currentSection = '';
+    let parsedData: any = {
+      name: '',
+      email: '',
+      phone: '',
+      location: '',
+      linkedin: '',
+      website: '',
+      summary: '',
+      education: '',
+      skills: '',
+      experience: '',
+      projects: '',
+    };
+
+    // Extract name (first line)
+    if (lines.length > 0) {
+      parsedData.name = lines[0].trim();
     }
 
-    generateCoverLetterLatex(coverLetterData: any, resumeData: any): string {
-        const template = Handlebars.compile(this.coverLetterTemplate);
-
-        // Parse the resume content to extract contact info
-        const parsedResume = this.parseResumeContent(resumeData.content);
-
-        const data = {
-            name: parsedResume.name,
-            email: parsedResume.email,
-            phone: parsedResume.phone,
-            location: parsedResume.location,
-            company: coverLetterData.company,
-            hiringManager: coverLetterData.hiringManager || '',
-            body: this.formatCoverLetterBody(coverLetterData.content)
-        };
-
-        return template(data);
+    // Extract contact info
+    for (let i = 1; i < Math.min(5, lines.length); i++) {
+      const line = lines[i].trim();
+      if (line.includes('@')) {
+        parsedData.email = line;
+      } else if (line.includes('(') && line.includes(')')) {
+        parsedData.phone = line;
+      } else if (line.includes('linkedin.com')) {
+        parsedData.linkedin = line;
+      } else if (line.includes('github.com') || line.includes('www.')) {
+        parsedData.website = line;
+      } else if (line && !line.includes('•') && !line.includes('-')) {
+        parsedData.location = line;
+      }
     }
 
-    private parseResumeContent(content: string): any {
-        const lines = content.split('\\n');
-        let currentSection = '';
-        let parsedData: any = {
-            name: '',
-            email: '',
-            phone: '',
-            location: '',
-            linkedin: '',
-            website: '',
-            summary: '',
-            education: '',
-            skills: '',
-            experience: '',
-            projects: ''
-        };
+    // Parse sections
+    let currentContent = '';
+    for (const line of lines) {
+      const trimmedLine = line.trim();
 
-        // Extract name (first line)
-        if (lines.length > 0) {
-            parsedData.name = lines[0].trim();
-        }
-
-        // Extract contact info
-        for (let i = 1; i < Math.min(5, lines.length); i++) {
-            const line = lines[i].trim();
-            if (line.includes('@')) {
-                parsedData.email = line;
-            } else if (line.includes('(') && line.includes(')')) {
-                parsedData.phone = line;
-            } else if (line.includes('linkedin.com')) {
-                parsedData.linkedin = line;
-            } else if (line.includes('github.com') || line.includes('www.')) {
-                parsedData.website = line;
-            } else if (line && !line.includes('•') && !line.includes('-')) {
-                parsedData.location = line;
-            }
-        }
-
-        // Parse sections
-        let currentContent = '';
-        for (const line of lines) {
-            const trimmedLine = line.trim();
-
-            if (trimmedLine.toUpperCase().includes('PROFESSIONAL SUMMARY')) {
-                currentSection = 'summary';
-                currentContent = '';
-            } else if (trimmedLine.toUpperCase().includes('EDUCATION')) {
-                currentSection = 'education';
-                currentContent = '';
-            } else if (trimmedLine.toUpperCase().includes('SKILLS')) {
-                currentSection = 'skills';
-                currentContent = '';
-            } else if (trimmedLine.toUpperCase().includes('EXPERIENCE')) {
-                currentSection = 'experience';
-                currentContent = '';
-            } else if (trimmedLine.toUpperCase().includes('PROJECTS')) {
-                currentSection = 'projects';
-                currentContent = '';
-            } else if (trimmedLine && currentSection) {
-                currentContent += trimmedLine + '\\n';
-            }
-        }
-
-        // Format the content for LaTeX
-        parsedData.summary = this.formatSummary(currentContent);
-        parsedData.education = this.formatEducation(currentContent);
-        parsedData.skills = this.formatSkills(currentContent);
-        parsedData.experience = this.formatExperience(currentContent);
-        parsedData.projects = this.formatProjects(currentContent);
-
-        return parsedData;
+      if (trimmedLine.toUpperCase().includes('PROFESSIONAL SUMMARY')) {
+        currentSection = 'summary';
+        currentContent = '';
+      } else if (trimmedLine.toUpperCase().includes('EDUCATION')) {
+        currentSection = 'education';
+        currentContent = '';
+      } else if (trimmedLine.toUpperCase().includes('SKILLS')) {
+        currentSection = 'skills';
+        currentContent = '';
+      } else if (trimmedLine.toUpperCase().includes('EXPERIENCE')) {
+        currentSection = 'experience';
+        currentContent = '';
+      } else if (trimmedLine.toUpperCase().includes('PROJECTS')) {
+        currentSection = 'projects';
+        currentContent = '';
+      } else if (trimmedLine && currentSection) {
+        currentContent += trimmedLine + '\\n';
+      }
     }
 
-    private formatSummary(content: string): string {
-        return content.replace(/\\n/g, ' ').trim();
+    // Format the content for LaTeX
+    parsedData.summary = this.formatSummary(currentContent);
+    parsedData.education = this.formatEducation(currentContent);
+    parsedData.skills = this.formatSkills(currentContent);
+    parsedData.experience = this.formatExperience(currentContent);
+    parsedData.projects = this.formatProjects(currentContent);
+
+    return parsedData;
+  }
+
+  private formatSummary(content: string): string {
+    return content.replace(/\\n/g, ' ').trim();
+  }
+
+  private formatEducation(content: string): string {
+    const lines = content.split('\\n').filter(line => line.trim());
+    let formatted = '';
+
+    for (const line of lines) {
+      if (line.trim()) {
+        formatted += `\\resumeSubheading{${line.trim()}}{}{}{}\\\\`;
+      }
     }
 
-    private formatEducation(content: string): string {
-        const lines = content.split('\\n').filter(line => line.trim());
-        let formatted = '';
+    return formatted;
+  }
 
-        for (const line of lines) {
-            if (line.trim()) {
-                formatted += `\\resumeSubheading{${line.trim()}}{}{}{}\\\\`;
-            }
-        }
+  private formatSkills(content: string): string {
+    const lines = content.split('\\n').filter(line => line.trim());
+    let formatted = '';
 
-        return formatted;
+    for (const line of lines) {
+      if (line.trim() && (line.includes('•') || line.includes('-'))) {
+        const skill = line.replace(/[•-]/, '').trim();
+        formatted += `\\resumeItem{${skill}}\\\\`;
+      }
     }
 
-    private formatSkills(content: string): string {
-        const lines = content.split('\\n').filter(line => line.trim());
-        let formatted = '';
+    return formatted;
+  }
 
-        for (const line of lines) {
-            if (line.trim() && (line.includes('•') || line.includes('-'))) {
-                const skill = line.replace(/[•-]/, '').trim();
-                formatted += `\\resumeItem{${skill}}\\\\`;
-            }
+  private formatExperience(content: string): string {
+    const lines = content.split('\\n').filter(line => line.trim());
+    let formatted = '';
+    let currentJob = '';
+    let currentCompany = '';
+    let currentDates = '';
+    let currentLocation = '';
+
+    for (const line of lines) {
+      if (line.includes('|') && !line.includes('•') && !line.includes('-')) {
+        // This is a job title line
+        const parts = line.split('|');
+        if (parts.length >= 2) {
+          currentJob = parts[0].trim();
+          currentCompany = parts[1].trim();
+          if (parts.length >= 3) {
+            currentDates = parts[2].trim();
+          }
+          if (parts.length >= 4) {
+            currentLocation = parts[3].trim();
+          }
         }
-
-        return formatted;
+      } else if (line.includes('•') || line.includes('-')) {
+        // This is a bullet point
+        const bullet = line.replace(/[•-]/, '').trim();
+        formatted += `\\resumeSubItem{${bullet}}\\\\`;
+      }
     }
 
-    private formatExperience(content: string): string {
-        const lines = content.split('\\n').filter(line => line.trim());
-        let formatted = '';
-        let currentJob = '';
-        let currentCompany = '';
-        let currentDates = '';
-        let currentLocation = '';
-
-        for (const line of lines) {
-            if (line.includes('|') && !line.includes('•') && !line.includes('-')) {
-                // This is a job title line
-                const parts = line.split('|');
-                if (parts.length >= 2) {
-                    currentJob = parts[0].trim();
-                    currentCompany = parts[1].trim();
-                    if (parts.length >= 3) {
-                        currentDates = parts[2].trim();
-                    }
-                    if (parts.length >= 4) {
-                        currentLocation = parts[3].trim();
-                    }
-                }
-            } else if (line.includes('•') || line.includes('-')) {
-                // This is a bullet point
-                const bullet = line.replace(/[•-]/, '').trim();
-                formatted += `\\resumeSubItem{${bullet}}\\\\`;
-            }
-        }
-
-        if (currentJob && currentCompany) {
-            formatted = `\\resumeSubheading{${currentJob}}{${currentDates}}{${currentCompany}}{${currentLocation}}\\\\${formatted}`;
-        }
-
-        return formatted;
+    if (currentJob && currentCompany) {
+      formatted = `\\resumeSubheading{${currentJob}}{${currentDates}}{${currentCompany}}{${currentLocation}}\\\\${formatted}`;
     }
 
-    private formatProjects(content: string): string {
-        const lines = content.split('\\n').filter(line => line.trim());
-        let formatted = '';
-        let currentProject = '';
-        let currentDates = '';
+    return formatted;
+  }
 
-        for (const line of lines) {
-            if (line.includes('|') && !line.includes('•') && !line.includes('-')) {
-                // This is a project title line
-                const parts = line.split('|');
-                if (parts.length >= 1) {
-                    currentProject = parts[0].trim();
-                    if (parts.length >= 2) {
-                        currentDates = parts[1].trim();
-                    }
-                }
-            } else if (line.includes('•') || line.includes('-')) {
-                // This is a bullet point
-                const bullet = line.replace(/[•-]/, '').trim();
-                formatted += `\\resumeSubItem{${bullet}}\\\\`;
-            }
+  private formatProjects(content: string): string {
+    const lines = content.split('\\n').filter(line => line.trim());
+    let formatted = '';
+    let currentProject = '';
+    let currentDates = '';
+
+    for (const line of lines) {
+      if (line.includes('|') && !line.includes('•') && !line.includes('-')) {
+        // This is a project title line
+        const parts = line.split('|');
+        if (parts.length >= 1) {
+          currentProject = parts[0].trim();
+          if (parts.length >= 2) {
+            currentDates = parts[1].trim();
+          }
         }
-
-        if (currentProject) {
-            formatted = `\\resumeSubheading{${currentProject}}{${currentDates}}{}{}\\\\${formatted}`;
-        }
-
-        return formatted;
+      } else if (line.includes('•') || line.includes('-')) {
+        // This is a bullet point
+        const bullet = line.replace(/[•-]/, '').trim();
+        formatted += `\\resumeSubItem{${bullet}}\\\\`;
+      }
     }
 
-    private formatCoverLetterBody(content: string): string {
-        // Split into paragraphs and format for LaTeX
-        const paragraphs = content.split('\\n\\n').filter(p => p.trim());
-        let formatted = '';
-
-        for (const paragraph of paragraphs) {
-            formatted += paragraph.trim() + '\\n\\n';
-        }
-
-        return formatted;
+    if (currentProject) {
+      formatted = `\\resumeSubheading{${currentProject}}{${currentDates}}{}{}\\\\${formatted}`;
     }
 
-    async convertPdfToLatex(pdfBuffer: Buffer): Promise<string> {
+    return formatted;
+  }
+
+  private formatCoverLetterBody(content: string): string {
+    // Split into paragraphs and format for LaTeX
+    const paragraphs = content.split('\\n\\n').filter(p => p.trim());
+    let formatted = '';
+
+    for (const paragraph of paragraphs) {
+      formatted += paragraph.trim() + '\\n\\n';
+    }
+
+    return formatted;
+  }
+
+  async convertPdfToLatex(pdfBuffer: Buffer): Promise<string> {
+    try {
+      // Extract text from PDF
+      const data = await pdfParse(pdfBuffer);
+      const extractedText = data.text.trim();
+
+      // Parse the extracted text and convert to LaTeX format
+      const _parsedData = this.parseResumeContent(extractedText);
+
+      // Generate LaTeX using the template
+      return this.generateResumeLatex({ content: extractedText });
+    } catch (error) {
+      throw new Error(`Failed to convert PDF to LaTeX: ${error.message}`);
+    }
+  }
+
+  async compileLatexToPdf(latexContent: string): Promise<Buffer> {
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      const { exec } = require('child_process');
+      const { promisify } = require('util');
+      const execAsync = promisify(exec);
+
+      // Create a temporary directory
+      const tempDir = path.join(process.cwd(), 'temp');
+      if (!fs.existsSync(tempDir)) {
+        fs.mkdirSync(tempDir, { recursive: true });
+      }
+
+      // Generate unique filename
+      const timestamp = Date.now();
+      const texFileName = `resume_${timestamp}.tex`;
+      const pdfFileName = `resume_${timestamp}.pdf`;
+      const texFilePath = path.join(tempDir, texFileName);
+      const pdfFilePath = path.join(tempDir, pdfFileName);
+
+      // Write LaTeX content to file
+      fs.writeFileSync(texFilePath, latexContent, 'utf8');
+
+      // Compile LaTeX to PDF using pdflatex with full path
+      try {
+        const pdflatexPath =
+          '/usr/local/texlive/2025/bin/universal-darwin/pdflatex';
+        const { stdout, stderr } = await execAsync(
+          `"${pdflatexPath}" -output-directory="${tempDir}" -interaction=nonstopmode "${texFilePath}"`,
+          {
+            timeout: 30000, // 30 second timeout
+            cwd: tempDir,
+          }
+        );
+
+        // Check if PDF was created
+        if (fs.existsSync(pdfFilePath)) {
+          const pdfBuffer = fs.readFileSync(pdfFilePath);
+
+          // Clean up temporary files
+          try {
+            fs.unlinkSync(texFilePath);
+            fs.unlinkSync(pdfFilePath);
+            // Also clean up auxiliary files
+            const auxFile = path.join(tempDir, `resume_${timestamp}.aux`);
+            const logFile = path.join(tempDir, `resume_${timestamp}.log`);
+            if (fs.existsSync(auxFile)) fs.unlinkSync(auxFile);
+            if (fs.existsSync(logFile)) fs.unlinkSync(logFile);
+          } catch (cleanupError) {
+            console.warn('Failed to clean up temporary files:', cleanupError);
+          }
+
+          return pdfBuffer;
+        } else {
+          throw new Error(
+            `PDF compilation failed. LaTeX output: ${stderr || stdout}`
+          );
+        }
+      } catch (compileError) {
+        // Clean up on error
         try {
-            // Extract text from PDF
-            const data = await pdfParse(pdfBuffer);
-            const extractedText = data.text.trim();
-
-            // Parse the extracted text and convert to LaTeX format
-            const _parsedData = this.parseResumeContent(extractedText);
-
-            // Generate LaTeX using the template
-            return this.generateResumeLatex({ content: extractedText });
-        } catch (error) {
-            throw new Error(`Failed to convert PDF to LaTeX: ${error.message}`);
+          if (fs.existsSync(texFilePath)) fs.unlinkSync(texFilePath);
+        } catch (cleanupError) {
+          console.warn('Failed to clean up temporary files:', cleanupError);
         }
+
+        throw new Error(`LaTeX compilation failed: ${compileError.message}`);
+      }
+    } catch (error) {
+      throw new Error(`Failed to compile LaTeX to PDF: ${error.message}`);
+    }
+  }
+
+  validateLatexContent(latexContent: string): {
+    isValid: boolean;
+    errors: string[];
+  } {
+    const errors: string[] = [];
+
+    // Basic LaTeX validation
+    if (!latexContent.includes('\\documentclass')) {
+      errors.push('Missing \\documentclass declaration');
     }
 
-    async compileLatexToPdf(latexContent: string): Promise<Buffer> {
-        try {
-            const fs = require('fs');
-            const path = require('path');
-            const { exec } = require('child_process');
-            const { promisify } = require('util');
-            const execAsync = promisify(exec);
-
-            // Create a temporary directory
-            const tempDir = path.join(process.cwd(), 'temp');
-            if (!fs.existsSync(tempDir)) {
-                fs.mkdirSync(tempDir, { recursive: true });
-            }
-
-            // Generate unique filename
-            const timestamp = Date.now();
-            const texFileName = `resume_${timestamp}.tex`;
-            const pdfFileName = `resume_${timestamp}.pdf`;
-            const texFilePath = path.join(tempDir, texFileName);
-            const pdfFilePath = path.join(tempDir, pdfFileName);
-
-            // Write LaTeX content to file
-            fs.writeFileSync(texFilePath, latexContent, 'utf8');
-
-            // Compile LaTeX to PDF using pdflatex with full path
-            try {
-                const pdflatexPath = '/usr/local/texlive/2025/bin/universal-darwin/pdflatex';
-                const { stdout, stderr } = await execAsync(`"${pdflatexPath}" -output-directory="${tempDir}" -interaction=nonstopmode "${texFilePath}"`, {
-                    timeout: 30000, // 30 second timeout
-                    cwd: tempDir
-                });
-
-                // Check if PDF was created
-                if (fs.existsSync(pdfFilePath)) {
-                    const pdfBuffer = fs.readFileSync(pdfFilePath);
-
-                    // Clean up temporary files
-                    try {
-                        fs.unlinkSync(texFilePath);
-                        fs.unlinkSync(pdfFilePath);
-                        // Also clean up auxiliary files
-                        const auxFile = path.join(tempDir, `resume_${timestamp}.aux`);
-                        const logFile = path.join(tempDir, `resume_${timestamp}.log`);
-                        if (fs.existsSync(auxFile)) fs.unlinkSync(auxFile);
-                        if (fs.existsSync(logFile)) fs.unlinkSync(logFile);
-                    } catch (cleanupError) {
-                        console.warn('Failed to clean up temporary files:', cleanupError);
-                    }
-
-                    return pdfBuffer;
-                } else {
-                    throw new Error(`PDF compilation failed. LaTeX output: ${stderr || stdout}`);
-                }
-            } catch (compileError) {
-                // Clean up on error
-                try {
-                    if (fs.existsSync(texFilePath)) fs.unlinkSync(texFilePath);
-                } catch (cleanupError) {
-                    console.warn('Failed to clean up temporary files:', cleanupError);
-                }
-
-                throw new Error(`LaTeX compilation failed: ${compileError.message}`);
-            }
-        } catch (error) {
-            throw new Error(`Failed to compile LaTeX to PDF: ${error.message}`);
-        }
+    if (!latexContent.includes('\\begin{document}')) {
+      errors.push('Missing \\begin{document}');
     }
 
-    validateLatexContent(latexContent: string): { isValid: boolean; errors: string[] } {
-        const errors: string[] = [];
-
-        // Basic LaTeX validation
-        if (!latexContent.includes('\\documentclass')) {
-            errors.push('Missing \\documentclass declaration');
-        }
-
-        if (!latexContent.includes('\\begin{document}')) {
-            errors.push('Missing \\begin{document}');
-        }
-
-        if (!latexContent.includes('\\end{document}')) {
-            errors.push('Missing \\end{document}');
-        }
-
-        // Check for unmatched braces
-        const openBraces = (latexContent.match(/\{/g) || []).length;
-        const closeBraces = (latexContent.match(/\}/g) || []).length;
-        if (openBraces !== closeBraces) {
-            errors.push('Unmatched braces in LaTeX content');
-        }
-
-        return {
-            isValid: errors.length === 0,
-            errors
-        };
+    if (!latexContent.includes('\\end{document}')) {
+      errors.push('Missing \\end{document}');
     }
 
-    extractLatexMetadata(latexContent: string): any {
-        const metadata: any = {};
-
-        // Extract document class
-        const docClassMatch = latexContent.match(/\\documentclass\[([^\]]*)\]\{([^}]+)\}/);
-        if (docClassMatch) {
-            metadata.documentClass = docClassMatch[2];
-            metadata.options = docClassMatch[1];
-        }
-
-        // Extract packages
-        const packageMatches = latexContent.match(/\\usepackage(?:\[[^\]]*\])?\{([^}]+)\}/g);
-        if (packageMatches) {
-            metadata.packages = packageMatches.map(match => {
-                const pkgMatch = match.match(/\\usepackage(?:\[[^\]]*\])?\{([^}]+)\}/);
-                return pkgMatch ? pkgMatch[1] : null;
-            }).filter(Boolean);
-        }
-
-        // Extract title if present
-        const titleMatch = latexContent.match(/\\title\{([^}]+)\}/);
-        if (titleMatch) {
-            metadata.title = titleMatch[1];
-        }
-
-        return metadata;
+    // Check for unmatched braces
+    const openBraces = (latexContent.match(/\{/g) || []).length;
+    const closeBraces = (latexContent.match(/\}/g) || []).length;
+    if (openBraces !== closeBraces) {
+      errors.push('Unmatched braces in LaTeX content');
     }
+
+    return {
+      isValid: errors.length === 0,
+      errors,
+    };
+  }
+
+  extractLatexMetadata(latexContent: string): any {
+    const metadata: any = {};
+
+    // Extract document class
+    const docClassMatch = latexContent.match(
+      /\\documentclass\[([^\]]*)\]\{([^}]+)\}/
+    );
+    if (docClassMatch) {
+      metadata.documentClass = docClassMatch[2];
+      metadata.options = docClassMatch[1];
+    }
+
+    // Extract packages
+    const packageMatches = latexContent.match(
+      /\\usepackage(?:\[[^\]]*\])?\{([^}]+)\}/g
+    );
+    if (packageMatches) {
+      metadata.packages = packageMatches
+        .map(match => {
+          const pkgMatch = match.match(
+            /\\usepackage(?:\[[^\]]*\])?\{([^}]+)\}/
+          );
+          return pkgMatch ? pkgMatch[1] : null;
+        })
+        .filter(Boolean);
+    }
+
+    // Extract title if present
+    const titleMatch = latexContent.match(/\\title\{([^}]+)\}/);
+    if (titleMatch) {
+      metadata.title = titleMatch[1];
+    }
+
+    return metadata;
+  }
 }

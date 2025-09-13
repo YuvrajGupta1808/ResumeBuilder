@@ -11,158 +11,186 @@ import { TailorResumeDto } from './dto/tailor-resume.dto';
 
 @Injectable()
 export class AiService {
-    private readonly logger = new Logger(AiService.name);
-    private openai: OpenAI;
+  private readonly logger = new Logger(AiService.name);
+  private openai: OpenAI;
 
-    constructor(
-        private configService: ConfigService,
-        private resumeService: ResumeService,
-        private jobService: JobService,
-        private cacheService: CacheService,
-        private latexService: LatexService,
-        private dockerLatexService: DockerLatexService,
-    ) {
-        this.openai = new OpenAI({
-            apiKey: this.configService.get('OPENAI_API_KEY'),
-        });
+  constructor(
+    private configService: ConfigService,
+    private resumeService: ResumeService,
+    private jobService: JobService,
+    private cacheService: CacheService,
+    private latexService: LatexService,
+    private dockerLatexService: DockerLatexService
+  ) {
+    this.openai = new OpenAI({
+      apiKey: this.configService.get('OPENAI_API_KEY'),
+    });
+  }
+
+  async tailorResume(tailorResumeDto: TailorResumeDto, userId: string) {
+    const { resumeId, jobTitle, company, jobDescription } = tailorResumeDto;
+
+    // Get resume data
+    const resume = await this.resumeService.findOne(resumeId, userId);
+    if (!resume) {
+      throw new Error('Resume not found');
     }
 
-    async tailorResume(tailorResumeDto: TailorResumeDto, userId: string) {
-        const { resumeId, jobTitle, company, jobDescription } = tailorResumeDto;
+    // Check cache first for tailored content only (not job history)
+    const jobDescHash = crypto
+      .createHash('sha256')
+      .update(jobDescription)
+      .digest('hex')
+      .slice(0, 16);
+    const cacheKey = `tailor:${resumeId}:${jobDescHash}`;
+    const cached = await this.cacheService.get(cacheKey);
 
-        // Get resume data
-        const resume = await this.resumeService.findOne(resumeId, userId);
-        if (!resume) {
-            throw new Error('Resume not found');
-        }
+    let tailoredResume: string;
+    let coverLetter: string;
 
-        // Check cache first for tailored content only (not job history)
-        const jobDescHash = crypto.createHash('sha256').update(jobDescription).digest('hex').slice(0, 16);
-        const cacheKey = `tailor:${resumeId}:${jobDescHash}`;
-        const cached = await this.cacheService.get(cacheKey);
+    if (cached) {
+      this.logger.log('Returning cached tailored content');
+      const cachedData = JSON.parse(cached);
+      tailoredResume = cachedData.tailoredResume;
+      coverLetter = cachedData.coverLetter;
+    } else {
+      // Create tailored resume
+      tailoredResume = await this.createTailoredResume(
+        resume.content,
+        jobTitle,
+        company,
+        jobDescription
+      );
 
-        let tailoredResume: string;
-        let coverLetter: string;
+      // Create cover letter
+      coverLetter = await this.createCoverLetter(
+        resume.content,
+        jobTitle,
+        company,
+        jobDescription
+      );
 
-        if (cached) {
-            this.logger.log('Returning cached tailored content');
-            const cachedData = JSON.parse(cached);
-            tailoredResume = cachedData.tailoredResume;
-            coverLetter = cachedData.coverLetter;
-        } else {
-            // Create tailored resume
-            tailoredResume = await this.createTailoredResume(
-                resume.content,
-                jobTitle,
-                company,
-                jobDescription,
-            );
+      // Cache the tailored content (without job history)
+      await this.cacheService.set(
+        cacheKey,
+        JSON.stringify({
+          tailoredResume,
+          coverLetter,
+        }),
+        3600
+      );
+    }
 
-            // Create cover letter
-            coverLetter = await this.createCoverLetter(
-                resume.content,
-                jobTitle,
-                company,
-                jobDescription,
-            );
+    try {
+      // Check if the original resume was LaTeX and compile if needed
+      let finalTailoredResume = tailoredResume;
+      let finalCoverLetter = coverLetter;
 
-            // Cache the tailored content (without job history)
-            await this.cacheService.set(cacheKey, JSON.stringify({
-                tailoredResume,
-                coverLetter,
-            }), 3600);
-        }
+      if (this.isLatexContent(resume.content)) {
+        this.logger.log(
+          'Original resume was LaTeX, compiling tailored content to PDF using Docker'
+        );
 
         try {
-            // Check if the original resume was LaTeX and compile if needed
-            let finalTailoredResume = tailoredResume;
-            let finalCoverLetter = coverLetter;
+          // Compile tailored resume LaTeX to PDF using Docker
+          const resumePdfBuffer =
+            await this.dockerLatexService.compileLatexToPdf(tailoredResume);
+          finalTailoredResume = `PDF_COMPILED:${resumePdfBuffer.toString('base64')}`;
 
-            if (this.isLatexContent(resume.content)) {
-                this.logger.log('Original resume was LaTeX, compiling tailored content to PDF using Docker');
+          // Compile cover letter LaTeX to PDF using Docker
+          const coverLetterPdfBuffer =
+            await this.dockerLatexService.compileLatexToPdf(coverLetter);
+          finalCoverLetter = `PDF_COMPILED:${coverLetterPdfBuffer.toString('base64')}`;
 
-                try {
-                    // Compile tailored resume LaTeX to PDF using Docker
-                    const resumePdfBuffer = await this.dockerLatexService.compileLatexToPdf(tailoredResume);
-                    finalTailoredResume = `PDF_COMPILED:${resumePdfBuffer.toString('base64')}`;
-
-                    // Compile cover letter LaTeX to PDF using Docker
-                    const coverLetterPdfBuffer = await this.dockerLatexService.compileLatexToPdf(coverLetter);
-                    finalCoverLetter = `PDF_COMPILED:${coverLetterPdfBuffer.toString('base64')}`;
-
-                    this.logger.log('Successfully compiled LaTeX to PDF using Docker');
-                } catch (compileError) {
-                    this.logger.error('Failed to compile LaTeX to PDF with Docker:', compileError);
-                    // Fall back to plain text if compilation fails
-                    this.logger.log('Falling back to plain text format');
-                }
-            }
-
-            // Save job history (always create new job history entry)
-            const jobHistory = await this.jobService.create({
-                resumeId,
-                jobTitle,
-                company,
-                jobDescription,
-                tailoredResume: finalTailoredResume,
-                coverLetter: finalCoverLetter,
-            }, userId);
-
-            const result = {
-                tailoredResume: finalTailoredResume,
-                coverLetter: finalCoverLetter,
-                jobHistoryId: jobHistory.id,
-            };
-
-            this.logger.log('AI Service Result:', JSON.stringify(result, null, 2));
-
-            return result;
-        } catch (error) {
-            this.logger.error('Error tailoring resume:', error);
-            throw new Error('Failed to tailor resume');
+          this.logger.log('Successfully compiled LaTeX to PDF using Docker');
+        } catch (compileError) {
+          this.logger.error(
+            'Failed to compile LaTeX to PDF with Docker:',
+            compileError
+          );
+          // Fall back to plain text if compilation fails
+          this.logger.log('Falling back to plain text format');
         }
+      }
+
+      // Save job history (always create new job history entry)
+      const jobHistory = await this.jobService.create(
+        {
+          resumeId,
+          jobTitle,
+          company,
+          jobDescription,
+          tailoredResume: finalTailoredResume,
+          coverLetter: finalCoverLetter,
+        },
+        userId
+      );
+
+      const result = {
+        tailoredResume: finalTailoredResume,
+        coverLetter: finalCoverLetter,
+        jobHistoryId: jobHistory.id,
+      };
+
+      this.logger.log('AI Service Result:', JSON.stringify(result, null, 2));
+
+      return result;
+    } catch (error) {
+      this.logger.error('Error tailoring resume:', error);
+      throw new Error('Failed to tailor resume');
     }
+  }
 
-    private isLatexContent(content: string): boolean {
-        // Check for common LaTeX patterns
-        const latexPatterns = [
-            /\\documentclass/,
-            /\\begin\{document\}/,
-            /\\end\{document\}/,
-            /\\section/,
-            /\\subsection/,
-            /\\textbf/,
-            /\\textit/,
-            /\\item/,
-            /\\begin\{itemize\}/,
-            /\\begin\{enumerate\}/,
-        ];
+  private isLatexContent(content: string): boolean {
+    // Check for common LaTeX patterns
+    const latexPatterns = [
+      /\\documentclass/,
+      /\\begin\{document\}/,
+      /\\end\{document\}/,
+      /\\section/,
+      /\\subsection/,
+      /\\textbf/,
+      /\\textit/,
+      /\\item/,
+      /\\begin\{itemize\}/,
+      /\\begin\{enumerate\}/,
+    ];
 
-        return latexPatterns.some(pattern => pattern.test(content));
+    return latexPatterns.some(pattern => pattern.test(content));
+  }
+
+  private async createTailoredResume(
+    originalResume: string,
+    jobTitle: string,
+    company: string,
+    jobDescription: string
+  ): Promise<string> {
+    const isLatex = this.isLatexContent(originalResume);
+
+    if (isLatex) {
+      return this.createTailoredLatexResume(
+        originalResume,
+        jobTitle,
+        company,
+        jobDescription
+      );
+    } else {
+      return this.createTailoredTextResume(
+        originalResume,
+        jobTitle,
+        company,
+        jobDescription
+      );
     }
+  }
 
-    private async createTailoredResume(
-        originalResume: string,
-        jobTitle: string,
-        company: string,
-        jobDescription: string,
-    ): Promise<string> {
-        const isLatex = this.isLatexContent(originalResume);
-
-        if (isLatex) {
-            return this.createTailoredLatexResume(originalResume, jobTitle, company, jobDescription);
-        } else {
-            return this.createTailoredTextResume(originalResume, jobTitle, company, jobDescription);
-        }
-    }
-
-    private async createTailoredTextResume(
-        originalResume: string,
-        jobTitle: string,
-        company: string,
-        jobDescription: string,
-    ): Promise<string> {
-        const prompt = `
+  private async createTailoredTextResume(
+    originalResume: string,
+    jobTitle: string,
+    company: string,
+    jobDescription: string
+  ): Promise<string> {
+    const prompt = `
 You are an expert resume writer. Your task is to make MINOR, TARGETED adjustments to the existing resume to better match the job requirements.
 
 JOB TITLE: ${jobTitle}
@@ -198,32 +226,33 @@ GOAL: Make the resume 10-15% more relevant to the job while keeping 85-90% of th
 Return ONLY the slightly adjusted resume content, no additional commentary.
 `;
 
-        const completion = await this.openai.chat.completions.create({
-            model: 'gpt-4',
-            messages: [
-                {
-                    role: 'system',
-                    content: 'You are an expert resume writer who makes MINIMAL, TARGETED adjustments to LaTeX resumes while PRESERVING the LaTeX format. You preserve 85-90% of the original content and only make subtle changes to improve job relevance. Never add fictional information or completely rewrite content. Always return valid LaTeX code.',
-                },
-                {
-                    role: 'user',
-                    content: prompt,
-                },
-            ],
-            max_tokens: 2000,
-            temperature: 0.7,
-        });
+    const completion = await this.openai.chat.completions.create({
+      model: 'gpt-4',
+      messages: [
+        {
+          role: 'system',
+          content:
+            'You are an expert resume writer who makes MINIMAL, TARGETED adjustments to LaTeX resumes while PRESERVING the LaTeX format. You preserve 85-90% of the original content and only make subtle changes to improve job relevance. Never add fictional information or completely rewrite content. Always return valid LaTeX code.',
+        },
+        {
+          role: 'user',
+          content: prompt,
+        },
+      ],
+      max_tokens: 2000,
+      temperature: 0.7,
+    });
 
-        return completion.choices[0].message.content || '';
-    }
+    return completion.choices[0].message.content || '';
+  }
 
-    private async createTailoredLatexResume(
-        originalLatex: string,
-        jobTitle: string,
-        company: string,
-        jobDescription: string,
-    ): Promise<string> {
-        const prompt = `
+  private async createTailoredLatexResume(
+    originalLatex: string,
+    jobTitle: string,
+    company: string,
+    jobDescription: string
+  ): Promise<string> {
+    const prompt = `
 You are an expert resume writer. Your task is to make MINOR, TARGETED adjustments to the LaTeX resume to better match the job requirements while PRESERVING the LaTeX format.
 
 JOB TITLE: ${jobTitle}
@@ -261,46 +290,57 @@ ${originalLatex}
         Return ONLY the tailored resume in LaTeX format, no additional commentary.
 `;
 
-        const completion = await this.openai.chat.completions.create({
-            model: 'gpt-4',
-            messages: [
-                {
-                    role: 'system',
-                    content: 'You are an expert resume writer who makes MINIMAL, TARGETED adjustments to LaTeX resumes while PRESERVING the EXACT LaTeX format and ALL formatting commands. You preserve 85-90% of the original content and only make subtle changes to improve job relevance. Never modify LaTeX commands, spacing, or formatting.',
-                },
-                {
-                    role: 'user',
-                    content: prompt,
-                },
-            ],
-            temperature: 0.3,
-        });
+    const completion = await this.openai.chat.completions.create({
+      model: 'gpt-4',
+      messages: [
+        {
+          role: 'system',
+          content:
+            'You are an expert resume writer who makes MINIMAL, TARGETED adjustments to LaTeX resumes while PRESERVING the EXACT LaTeX format and ALL formatting commands. You preserve 85-90% of the original content and only make subtle changes to improve job relevance. Never modify LaTeX commands, spacing, or formatting.',
+        },
+        {
+          role: 'user',
+          content: prompt,
+        },
+      ],
+      temperature: 0.3,
+    });
 
-        return completion.choices[0].message.content || '';
+    return completion.choices[0].message.content || '';
+  }
+
+  private async createCoverLetter(
+    resumeContent: string,
+    jobTitle: string,
+    company: string,
+    jobDescription: string
+  ): Promise<string> {
+    const isLatex = this.isLatexContent(resumeContent);
+
+    if (isLatex) {
+      return this.createLatexCoverLetter(
+        resumeContent,
+        jobTitle,
+        company,
+        jobDescription
+      );
+    } else {
+      return this.createTextCoverLetter(
+        resumeContent,
+        jobTitle,
+        company,
+        jobDescription
+      );
     }
+  }
 
-    private async createCoverLetter(
-        resumeContent: string,
-        jobTitle: string,
-        company: string,
-        jobDescription: string,
-    ): Promise<string> {
-        const isLatex = this.isLatexContent(resumeContent);
-
-        if (isLatex) {
-            return this.createLatexCoverLetter(resumeContent, jobTitle, company, jobDescription);
-        } else {
-            return this.createTextCoverLetter(resumeContent, jobTitle, company, jobDescription);
-        }
-    }
-
-    private async createTextCoverLetter(
-        resumeContent: string,
-        jobTitle: string,
-        company: string,
-        jobDescription: string,
-    ): Promise<string> {
-        const prompt = `
+  private async createTextCoverLetter(
+    resumeContent: string,
+    jobTitle: string,
+    company: string,
+    jobDescription: string
+  ): Promise<string> {
+    const prompt = `
 You are an expert cover letter writer. Create a compelling cover letter for the following job application using ONLY the information from the candidate's resume.
 
 JOB TITLE: ${jobTitle}
@@ -331,32 +371,33 @@ IMPORTANT: Only reference skills, experiences, and achievements that are actuall
 Return ONLY the cover letter content, no additional commentary or explanations.
 `;
 
-        const completion = await this.openai.chat.completions.create({
-            model: 'gpt-4',
-            messages: [
-                {
-                    role: 'system',
-                    content: 'You are an expert cover letter writer who creates compelling, authentic cover letters using ONLY the information provided in the candidate\'s resume. You reference specific projects, experiences, and skills from the resume to create a personalized, genuine cover letter.',
-                },
-                {
-                    role: 'user',
-                    content: prompt,
-                },
-            ],
-            max_tokens: 1000,
-            temperature: 0.7,
-        });
+    const completion = await this.openai.chat.completions.create({
+      model: 'gpt-4',
+      messages: [
+        {
+          role: 'system',
+          content:
+            "You are an expert cover letter writer who creates compelling, authentic cover letters using ONLY the information provided in the candidate's resume. You reference specific projects, experiences, and skills from the resume to create a personalized, genuine cover letter.",
+        },
+        {
+          role: 'user',
+          content: prompt,
+        },
+      ],
+      max_tokens: 1000,
+      temperature: 0.7,
+    });
 
-        return completion.choices[0].message.content || '';
-    }
+    return completion.choices[0].message.content || '';
+  }
 
-    private async createLatexCoverLetter(
-        resumeContent: string,
-        jobTitle: string,
-        company: string,
-        jobDescription: string,
-    ): Promise<string> {
-        const prompt = `
+  private async createLatexCoverLetter(
+    resumeContent: string,
+    jobTitle: string,
+    company: string,
+    jobDescription: string
+  ): Promise<string> {
+    const prompt = `
 You are an expert cover letter writer. Create a compelling cover letter for the following job application using ONLY the information from the candidate's resume.
 
 JOB TITLE: ${jobTitle}
@@ -388,22 +429,23 @@ IMPORTANT: Only reference skills, achievements, and experiences that are actuall
 Return ONLY the cover letter content in LaTeX format with proper document structure, no additional commentary or explanations.
 `;
 
-        const completion = await this.openai.chat.completions.create({
-            model: 'gpt-4',
-            messages: [
-                {
-                    role: 'system',
-                    content: 'You are an expert cover letter writer who creates compelling, authentic cover letters using ONLY the information provided in the candidate\'s resume. You reference specific projects, experiences, and skills from the resume to create a personalized, genuine cover letter.',
-                },
-                {
-                    role: 'user',
-                    content: prompt,
-                },
-            ],
-            max_tokens: 1000,
-            temperature: 0.7,
-        });
+    const completion = await this.openai.chat.completions.create({
+      model: 'gpt-4',
+      messages: [
+        {
+          role: 'system',
+          content:
+            "You are an expert cover letter writer who creates compelling, authentic cover letters using ONLY the information provided in the candidate's resume. You reference specific projects, experiences, and skills from the resume to create a personalized, genuine cover letter.",
+        },
+        {
+          role: 'user',
+          content: prompt,
+        },
+      ],
+      max_tokens: 1000,
+      temperature: 0.7,
+    });
 
-        return completion.choices[0].message.content || '';
-    }
+    return completion.choices[0].message.content || '';
+  }
 }

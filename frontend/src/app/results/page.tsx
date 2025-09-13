@@ -20,75 +20,83 @@ import {
   HStack,
   SimpleGrid,
   Text,
-  VStack
+  VStack,
 } from '@chakra-ui/react';
-import { FiCheckCircle, FiDownload, FiEdit, FiHome, FiShare, FiStar } from 'react-icons/fi';
+import {
+  FiCheckCircle,
+  FiDownload,
+  FiEdit,
+  FiHome,
+  FiShare,
+  FiStar,
+} from 'react-icons/fi';
 
 export default function ResultsPage() {
   return (
-    <Box bg="gray.50" minH="100vh">
+    <Box bg='gray.50' minH='100vh'>
       <Navbar />
-      <Box display="flex">
-        <Box flex="1" p={8}>
-          <Container maxW="container.xl">
-            <VStack align="start" spacing={8}>
+      <Box display='flex'>
+        <Box flex='1' p={8}>
+          <Container maxW='container.xl'>
+            <VStack align='start' spacing={8}>
               {/* Header Section */}
-              <Box w="full">
+              <Box w='full'>
                 <Breadcrumb mb={4}>
                   <BreadcrumbItem>
-                    <BreadcrumbLink href="/" color="gray.500">
+                    <BreadcrumbLink href='/' color='gray.500'>
                       <HStack spacing={2}>
                         <FiHome size={12} />
-                        <Text fontSize="sm">Home</Text>
+                        <Text fontSize='sm'>Home</Text>
                       </HStack>
                     </BreadcrumbLink>
                   </BreadcrumbItem>
                   <BreadcrumbItem>
-                    <BreadcrumbLink href="/dashboard" color="gray.500">
+                    <BreadcrumbLink href='/dashboard' color='gray.500'>
                       Dashboard
                     </BreadcrumbLink>
                   </BreadcrumbItem>
                   <BreadcrumbItem isCurrentPage>
-                    <BreadcrumbLink color="brand.600" fontWeight="medium">
+                    <BreadcrumbLink color='brand.600' fontWeight='medium'>
                       Results
                     </BreadcrumbLink>
                   </BreadcrumbItem>
                 </Breadcrumb>
-                
-                <HStack justify="space-between" align="start" mb={6}>
-                  <VStack align="start" spacing={3}>
-                    <HStack spacing={3} align="center">
+
+                <HStack justify='space-between' align='start' mb={6}>
+                  <VStack align='start' spacing={3}>
+                    <HStack spacing={3} align='center'>
                       <Box
                         p={3}
-                        bg="green.100"
-                        borderRadius="xl"
-                        color="green.600"
+                        bg='green.100'
+                        borderRadius='xl'
+                        color='green.600'
                       >
                         <FiCheckCircle size={24} />
                       </Box>
-                      <VStack align="start" spacing={1}>
-                        <Heading 
-                          size="xl" 
+                      <VStack align='start' spacing={1}>
+                        <Heading
+                          size='xl'
                           fontWeight={700}
-                          bg="linear-gradient(to right, #1a202c, #805ad5)"
-                          bgClip="text"
+                          bg='linear-gradient(to right, #1a202c, #805ad5)'
+                          bgClip='text'
                         >
                           Tailored Results
                         </Heading>
-                        <Text color="gray.600" fontSize="lg">
-                          Your resume and cover letter have been customized for the job application.
+                        <Text color='gray.600' fontSize='lg'>
+                          Your resume and cover letter have been customized for
+                          the job application.
                         </Text>
                       </VStack>
                     </HStack>
                   </VStack>
-                  
+
                   <HStack spacing={3}>
                     <Badge
-                      colorScheme="green"
+                      colorScheme='green'
                       px={3}
                       py={1}
-                      borderRadius="full"
-                      fontSize="sm"
+                      borderRadius='full'
+                      fontSize='sm'
                     >
                       <HStack spacing={1}>
                         <FiStar size={12} />
@@ -100,68 +108,81 @@ export default function ResultsPage() {
               </Box>
 
               {/* Success Alert */}
-              <Alert status="success" borderRadius="xl" bg="green.50" border="1px" borderColor="green.200">
-                <AlertIcon color="green.500" />
+              <Alert
+                status='success'
+                borderRadius='xl'
+                bg='green.50'
+                border='1px'
+                borderColor='green.200'
+              >
+                <AlertIcon color='green.500' />
                 <Box>
-                  <AlertTitle color="green.800" fontSize="sm" fontWeight="semibold">
+                  <AlertTitle
+                    color='green.800'
+                    fontSize='sm'
+                    fontWeight='semibold'
+                  >
                     Generation Complete!
                   </AlertTitle>
-                  <AlertDescription color="green.700" fontSize="sm">
-                    Your tailored resume and cover letter are ready. Review the content and download when satisfied.
+                  <AlertDescription color='green.700' fontSize='sm'>
+                    Your tailored resume and cover letter are ready. Review the
+                    content and download when satisfied.
                   </AlertDescription>
                 </Box>
               </Alert>
 
               {/* Action Buttons */}
               <Box
-                bg="white"
+                bg='white'
                 p={6}
-                borderRadius="xl"
-                border="1px"
-                borderColor="gray.200"
-                w="full"
+                borderRadius='xl'
+                border='1px'
+                borderColor='gray.200'
+                w='full'
               >
-                <HStack justify="space-between" align="center">
-                  <VStack align="start" spacing={1}>
-                    <Text fontWeight="semibold" color="gray.800">
+                <HStack justify='space-between' align='center'>
+                  <VStack align='start' spacing={1}>
+                    <Text fontWeight='semibold' color='gray.800'>
                       Ready to download?
                     </Text>
-                    <Text fontSize="sm" color="gray.600">
+                    <Text fontSize='sm' color='gray.600'>
                       Get your tailored documents in PDF format
                     </Text>
                   </VStack>
                   <HStack spacing={3}>
                     <Button
                       leftIcon={<FiEdit />}
-                      variant="outline"
-                      borderColor="brand.300"
-                      color="brand.600"
+                      variant='outline'
+                      borderColor='brand.300'
+                      color='brand.600'
                       _hover={{
-                        bg: "brand.50",
-                        borderColor: "brand.400",
+                        bg: 'brand.50',
+                        borderColor: 'brand.400',
                       }}
                     >
                       Edit Content
                     </Button>
                     <Button
                       leftIcon={<FiDownload />}
-                      bg="linear-gradient(to right, #9f7aea, #805ad5)"
-                      color="white"
+                      bg='linear-gradient(to right, #9f7aea, #805ad5)'
+                      color='white'
                       onClick={() => {
-                        const jobHistoryId = new URLSearchParams(window.location.search).get('jobHistoryId');
+                        const jobHistoryId = new URLSearchParams(
+                          window.location.search
+                        ).get('jobHistoryId');
                         if (jobHistoryId) {
                           window.location.href = `/download?jobHistoryId=${jobHistoryId}`;
                         }
                       }}
                       _hover={{
-                        bg: "linear-gradient(to right, #8b5cf6, #7c3aed)",
-                        transform: "translateY(-1px)",
-                        boxShadow: "lg",
+                        bg: 'linear-gradient(to right, #8b5cf6, #7c3aed)',
+                        transform: 'translateY(-1px)',
+                        boxShadow: 'lg',
                       }}
                       _active={{
-                        transform: "translateY(0px)",
+                        transform: 'translateY(0px)',
                       }}
-                      transition="all 0.2s"
+                      transition='all 0.2s'
                     >
                       Download All
                     </Button>
@@ -170,29 +191,24 @@ export default function ResultsPage() {
               </Box>
 
               {/* Stats */}
-              <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6} w="full">
+              <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6} w='full'>
                 <Box
-                  bg="white"
+                  bg='white'
                   p={6}
-                  borderRadius="xl"
-                  border="1px"
-                  borderColor="gray.200"
-                  textAlign="center"
+                  borderRadius='xl'
+                  border='1px'
+                  borderColor='gray.200'
+                  textAlign='center'
                 >
                   <VStack spacing={3}>
-                    <Box
-                      p={3}
-                      bg="blue.100"
-                      borderRadius="xl"
-                      color="blue.600"
-                    >
+                    <Box p={3} bg='blue.100' borderRadius='xl' color='blue.600'>
                       <FiCheckCircle size={24} />
                     </Box>
                     <VStack spacing={1}>
-                      <Text fontSize="2xl" fontWeight="bold" color="gray.800">
+                      <Text fontSize='2xl' fontWeight='bold' color='gray.800'>
                         95%
                       </Text>
-                      <Text fontSize="sm" color="gray.600">
+                      <Text fontSize='sm' color='gray.600'>
                         Match Score
                       </Text>
                     </VStack>
@@ -200,27 +216,27 @@ export default function ResultsPage() {
                 </Box>
 
                 <Box
-                  bg="white"
+                  bg='white'
                   p={6}
-                  borderRadius="xl"
-                  border="1px"
-                  borderColor="gray.200"
-                  textAlign="center"
+                  borderRadius='xl'
+                  border='1px'
+                  borderColor='gray.200'
+                  textAlign='center'
                 >
                   <VStack spacing={3}>
                     <Box
                       p={3}
-                      bg="green.100"
-                      borderRadius="xl"
-                      color="green.600"
+                      bg='green.100'
+                      borderRadius='xl'
+                      color='green.600'
                     >
                       <FiStar size={24} />
                     </Box>
                     <VStack spacing={1}>
-                      <Text fontSize="2xl" fontWeight="bold" color="gray.800">
+                      <Text fontSize='2xl' fontWeight='bold' color='gray.800'>
                         12
                       </Text>
-                      <Text fontSize="sm" color="gray.600">
+                      <Text fontSize='sm' color='gray.600'>
                         Keywords Matched
                       </Text>
                     </VStack>
@@ -228,27 +244,27 @@ export default function ResultsPage() {
                 </Box>
 
                 <Box
-                  bg="white"
+                  bg='white'
                   p={6}
-                  borderRadius="xl"
-                  border="1px"
-                  borderColor="gray.200"
-                  textAlign="center"
+                  borderRadius='xl'
+                  border='1px'
+                  borderColor='gray.200'
+                  textAlign='center'
                 >
                   <VStack spacing={3}>
                     <Box
                       p={3}
-                      bg="purple.100"
-                      borderRadius="xl"
-                      color="purple.600"
+                      bg='purple.100'
+                      borderRadius='xl'
+                      color='purple.600'
                     >
                       <FiShare size={24} />
                     </Box>
                     <VStack spacing={1}>
-                      <Text fontSize="2xl" fontWeight="bold" color="gray.800">
+                      <Text fontSize='2xl' fontWeight='bold' color='gray.800'>
                         2
                       </Text>
-                      <Text fontSize="sm" color="gray.600">
+                      <Text fontSize='sm' color='gray.600'>
                         Documents Ready
                       </Text>
                     </VStack>
@@ -256,10 +272,10 @@ export default function ResultsPage() {
                 </Box>
               </SimpleGrid>
 
-              <Divider borderColor="gray.300" />
-              
+              <Divider borderColor='gray.300' />
+
               {/* Results Content */}
-              <VStack spacing={8} w="full">
+              <VStack spacing={8} w='full'>
                 <TailoredResume />
                 <CoverLetter />
               </VStack>

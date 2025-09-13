@@ -8,9 +8,9 @@ import { AiController } from './ai.controller';
 import { AiService } from './ai.service';
 
 @Module({
-    imports: [ConfigModule, JobModule, ResumeModule, CacheModule, LatexModule],
-    providers: [AiService],
-    controllers: [AiController],
-    exports: [AiService],
+  imports: [ConfigModule, JobModule, ResumeModule, CacheModule, LatexModule],
+  providers: [AiService],
+  controllers: [AiController],
+  exports: [AiService],
 })
-export class AiModule { }
+export class AiModule {}

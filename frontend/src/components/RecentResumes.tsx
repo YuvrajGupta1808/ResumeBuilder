@@ -2,14 +2,7 @@
 
 import { useApiClient } from '@/lib/api-client';
 import { Resume } from '@/types';
-import {
-  Box,
-  Button,
-  Heading,
-  HStack,
-  Text,
-  VStack
-} from '@chakra-ui/react';
+import { Box, Button, Heading, HStack, Text, VStack } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { FiCalendar, FiEye, FiFileText } from 'react-icons/fi';
 
@@ -77,9 +70,9 @@ export function RecentResumes() {
     return (
       <Box
         bg={bg}
-        border="1px"
+        border='1px'
         borderColor={borderColor}
-        borderRadius="lg"
+        borderRadius='lg'
         p={6}
       >
         <Text>Loading resumes...</Text>
@@ -88,54 +81,48 @@ export function RecentResumes() {
   }
 
   return (
-    <Box
-      bg={bg}
-      border="1px"
-      borderColor={borderColor}
-      borderRadius="lg"
-      p={4}
-    >
-      <VStack align="start" spacing={4}>
-        <Heading size="md">Recent Resumes</Heading>
-        
+    <Box bg={bg} border='1px' borderColor={borderColor} borderRadius='lg' p={4}>
+      <VStack align='start' spacing={4}>
+        <Heading size='md'>Recent Resumes</Heading>
+
         {resumes.length === 0 ? (
-          <Text color="gray.500" fontSize="sm">
+          <Text color='gray.500' fontSize='sm'>
             No resumes uploaded yet. Upload your first resume to get started.
           </Text>
         ) : (
-          <VStack spacing={3} w="full">
-            {resumes.map((resume) => (
+          <VStack spacing={3} w='full'>
+            {resumes.map(resume => (
               <Box
                 key={resume.id}
                 p={2}
-                border="1px"
+                border='1px'
                 borderColor={borderColor}
-                borderRadius="md"
-                w="full"
+                borderRadius='md'
+                w='full'
                 _hover={{ bg: 'gray.50' }}
-                cursor="pointer"
+                cursor='pointer'
               >
-                <HStack justify="space-between" align="start">
+                <HStack justify='space-between' align='start'>
                   <HStack spacing={3}>
-                    <FiFileText color="brand.400" />
-                    <VStack align="start" spacing={1}>
-                      <Text fontWeight="semibold" fontSize="sm">
+                    <FiFileText color='brand.400' />
+                    <VStack align='start' spacing={1}>
+                      <Text fontWeight='semibold' fontSize='sm'>
                         {resume.title}
                       </Text>
                       <HStack spacing={2}>
-                        <FiCalendar size={12} color="gray.400" />
-                        <Text fontSize="xs" color="gray.500">
+                        <FiCalendar size={12} color='gray.400' />
+                        <Text fontSize='xs' color='gray.500'>
                           {new Date(resume.createdAt).toLocaleDateString()}
                         </Text>
                       </HStack>
                     </VStack>
                   </HStack>
                   <Button
-                    size="xs"
-                    variant="ghost"
+                    size='xs'
+                    variant='ghost'
                     leftIcon={<FiEye />}
                     onClick={() => viewResume(resume)}
-                    colorScheme="blue"
+                    colorScheme='blue'
                   >
                     View
                   </Button>

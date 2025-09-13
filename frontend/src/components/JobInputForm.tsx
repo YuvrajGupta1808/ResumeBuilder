@@ -14,7 +14,7 @@ import {
   Text,
   Textarea,
   useToast,
-  VStack
+  VStack,
 } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
@@ -26,7 +26,9 @@ const jobInputSchema = z.object({
   resumeId: z.string().min(1, 'Please select a resume'),
   jobTitle: z.string().min(1, 'Job title is required'),
   company: z.string().min(1, 'Company name is required'),
-  jobDescription: z.string().min(50, 'Job description must be at least 50 characters'),
+  jobDescription: z
+    .string()
+    .min(50, 'Job description must be at least 50 characters'),
 });
 
 type JobInputFormData = z.infer<typeof jobInputSchema>;
@@ -70,7 +72,7 @@ export function JobInputForm() {
       // First, tailor the resume with AI
       const response = await apiClient.post('/ai/tailor-resume', data);
       console.log('AI tailoring response:', response.data);
-      
+
       toast({
         title: 'Resume tailored successfully!',
         description: 'Your resume and cover letter are ready.',
@@ -80,7 +82,10 @@ export function JobInputForm() {
       });
 
       // Redirect to download page
-      console.log('Redirecting to download page with jobHistoryId:', response.data.jobHistoryId);
+      console.log(
+        'Redirecting to download page with jobHistoryId:',
+        response.data.jobHistoryId
+      );
       window.location.href = `/download?jobHistoryId=${response.data.jobHistoryId}`;
     } catch (error) {
       toast({
@@ -95,19 +100,18 @@ export function JobInputForm() {
     }
   };
 
-
   return (
-    <Box w="full">
+    <Box w='full'>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <VStack spacing={8} align="stretch">
+        <VStack spacing={8} align='stretch'>
           <FormControl isInvalid={!!errors.resumeId}>
-            <FormLabel 
-              fontSize="lg" 
-              fontWeight="700" 
-              color="gray.800" 
+            <FormLabel
+              fontSize='lg'
+              fontWeight='700'
+              color='gray.800'
               mb={4}
-              display="flex"
-              alignItems="center"
+              display='flex'
+              alignItems='center'
               gap={3}
               ml={2}
             >
@@ -116,13 +120,13 @@ export function JobInputForm() {
             </FormLabel>
             <Select
               {...register('resumeId')}
-              placeholder="Choose a resume to tailor for the job"
-              size="lg"
-              h="60px"
-              borderRadius="xl"
-              border="2px solid"
-              borderColor="gray.200"
-              bg="white"
+              placeholder='Choose a resume to tailor for the job'
+              size='lg'
+              h='60px'
+              borderRadius='xl'
+              border='2px solid'
+              borderColor='gray.200'
+              bg='white'
               ml={6}
               mr={6}
               _hover={{
@@ -132,8 +136,8 @@ export function JobInputForm() {
                 borderColor: 'brand.400',
                 boxShadow: '0 0 0 3px rgba(0, 136, 255, 0.1)',
               }}
-              fontSize="md"
-              fontWeight="500"
+              fontSize='md'
+              fontWeight='500'
               sx={{
                 '> option': {
                   bg: 'white',
@@ -141,31 +145,37 @@ export function JobInputForm() {
                 },
               }}
             >
-              {resumes.map((resume) => (
+              {resumes.map(resume => (
                 <option key={resume.id} value={resume.id}>
                   {resume.title}
                 </option>
               ))}
             </Select>
-            <FormErrorMessage ml={6} fontSize="sm" fontWeight="500">
+            <FormErrorMessage ml={6} fontSize='sm' fontWeight='500'>
               {errors.resumeId?.message}
             </FormErrorMessage>
             {resumes.length === 0 && (
-              <Text ml={6} fontSize="sm" color="orange.500" mt={2} fontWeight="500">
+              <Text
+                ml={6}
+                fontSize='sm'
+                color='orange.500'
+                mt={2}
+                fontWeight='500'
+              >
                 No resumes found. Please upload a resume first.
               </Text>
             )}
           </FormControl>
 
-          <HStack spacing={6} align="start">
-            <FormControl isInvalid={!!errors.jobTitle} flex="1">
-              <FormLabel 
-                fontSize="lg" 
-                fontWeight="700" 
-                color="gray.800" 
+          <HStack spacing={6} align='start'>
+            <FormControl isInvalid={!!errors.jobTitle} flex='1'>
+              <FormLabel
+                fontSize='lg'
+                fontWeight='700'
+                color='gray.800'
                 mb={4}
-                display="flex"
-                alignItems="center"
+                display='flex'
+                alignItems='center'
                 gap={3}
                 ml={2}
               >
@@ -174,17 +184,17 @@ export function JobInputForm() {
               </FormLabel>
               <Input
                 {...register('jobTitle')}
-                placeholder="e.g., Senior Software Engineer"
-                size="lg"
-                h="60px"
-                borderRadius="xl"
-                border="2px solid"
-                borderColor="gray.200"
-                bg="white"
+                placeholder='e.g., Senior Software Engineer'
+                size='lg'
+                h='60px'
+                borderRadius='xl'
+                border='2px solid'
+                borderColor='gray.200'
+                bg='white'
                 ml={6}
                 mr={3}
                 px={6}
-                width={"72%"}
+                width={'72%'}
                 _hover={{
                   borderColor: 'brand.300',
                 }}
@@ -192,26 +202,26 @@ export function JobInputForm() {
                   borderColor: 'brand.400',
                   boxShadow: '0 0 0 3px rgba(0, 136, 255, 0.1)',
                 }}
-                fontSize="md"
-                fontWeight="500"
+                fontSize='md'
+                fontWeight='500'
                 _placeholder={{
                   color: 'gray.400',
                   fontSize: 'md',
                 }}
               />
-              <FormErrorMessage ml={6} fontSize="sm" fontWeight="500">
+              <FormErrorMessage ml={6} fontSize='sm' fontWeight='500'>
                 {errors.jobTitle?.message}
               </FormErrorMessage>
             </FormControl>
 
-            <FormControl isInvalid={!!errors.company} flex="1">
-              <FormLabel 
-                fontSize="lg" 
-                fontWeight="700" 
-                color="gray.800" 
+            <FormControl isInvalid={!!errors.company} flex='1'>
+              <FormLabel
+                fontSize='lg'
+                fontWeight='700'
+                color='gray.800'
                 mb={4}
-                display="flex"
-                alignItems="center"
+                display='flex'
+                alignItems='center'
                 gap={3}
                 ml={2}
               >
@@ -220,17 +230,17 @@ export function JobInputForm() {
               </FormLabel>
               <Input
                 {...register('company')}
-                placeholder="e.g., Google, Microsoft"
-                size="lg"
-                h="60px"
-                borderRadius="xl"
-                border="2px solid"
-                borderColor="gray.200"
-                bg="white"
+                placeholder='e.g., Google, Microsoft'
+                size='lg'
+                h='60px'
+                borderRadius='xl'
+                border='2px solid'
+                borderColor='gray.200'
+                bg='white'
                 ml={3}
                 mr={6}
                 px={6}
-                width={"72%"}
+                width={'72%'}
                 _hover={{
                   borderColor: 'brand.300',
                 }}
@@ -238,35 +248,44 @@ export function JobInputForm() {
                   borderColor: 'brand.400',
                   boxShadow: '0 0 0 3px rgba(0, 136, 255, 0.1)',
                 }}
-                fontSize="md"
-                fontWeight="500"
+                fontSize='md'
+                fontWeight='500'
                 _placeholder={{
                   color: 'gray.400',
                   fontSize: 'md',
                 }}
               />
-              <FormErrorMessage ml={3} fontSize="sm" fontWeight="500">
+              <FormErrorMessage ml={3} fontSize='sm' fontWeight='500'>
                 {errors.company?.message}
               </FormErrorMessage>
             </FormControl>
           </HStack>
 
           <FormControl isInvalid={!!errors.jobDescription}>
-            <FormLabel 
-              fontSize="lg" 
-              fontWeight="700" 
-              color="gray.800" 
+            <FormLabel
+              fontSize='lg'
+              fontWeight='700'
+              color='gray.800'
               mb={4}
-              display="flex"
-              alignItems="center"
+              display='flex'
+              alignItems='center'
               gap={3}
               ml={2}
             >
               <FiFileText size={20} />
               Job Description
             </FormLabel>
-            <Text ml={6} fontSize="sm" color="gray.600" mb={4} fontWeight="500" lineHeight="1.6">
-              Paste the complete job description below. The more detailed it is, the better we can tailor your resume and generate your cover letter.
+            <Text
+              ml={6}
+              fontSize='sm'
+              color='gray.600'
+              mb={4}
+              fontWeight='500'
+              lineHeight='1.6'
+            >
+              Paste the complete job description below. The more detailed it is,
+              the better we can tailor your resume and generate your cover
+              letter.
             </Text>
             <Textarea
               {...register('jobDescription')}
@@ -288,15 +307,15 @@ Responsibilities:
 • Participate in code reviews and technical discussions
 ..."
               rows={15}
-              borderRadius="xl"
-              border="2px solid"
-              borderColor="gray.200"
+              borderRadius='xl'
+              border='2px solid'
+              borderColor='gray.200'
               ml={6}
               mr={6}
               px={6}
               py={4}
-              width={"85%"}
-              bg="white"
+              width={'85%'}
+              bg='white'
               _hover={{
                 borderColor: 'brand.300',
               }}
@@ -304,33 +323,33 @@ Responsibilities:
                 borderColor: 'brand.400',
                 boxShadow: '0 0 0 3px rgba(0, 136, 255, 0.1)',
               }}
-              fontSize="md"
-              fontWeight="500"
-              resize="vertical"
-              minH="320px"
+              fontSize='md'
+              fontWeight='500'
+              resize='vertical'
+              minH='320px'
               _placeholder={{
                 color: 'gray.400',
                 fontSize: 'sm',
                 lineHeight: '1.5',
               }}
             />
-            <FormErrorMessage ml={6} fontSize="sm" fontWeight="500">
+            <FormErrorMessage ml={6} fontSize='sm' fontWeight='500'>
               {errors.jobDescription?.message}
             </FormErrorMessage>
           </FormControl>
 
           <Button
-            type="submit"
-            size="lg"
+            type='submit'
+            size='lg'
             isLoading={isProcessing}
-            loadingText="Processing with AI..."
-            h="56px"
-            borderRadius="xl"
-            fontSize="lg"
-            fontWeight="700"
-            bg="linear-gradient(135deg, #9333ea 0%, #7c3aed 100%)"
-            color="white"
-            border="none"
+            loadingText='Processing with AI...'
+            h='56px'
+            borderRadius='xl'
+            fontSize='lg'
+            fontWeight='700'
+            bg='linear-gradient(135deg, #9333ea 0%, #7c3aed 100%)'
+            color='white'
+            border='none'
             ml={6}
             mr={6}
             sx={{

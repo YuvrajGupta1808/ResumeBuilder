@@ -4,9 +4,9 @@ import { JobController } from './job.controller';
 import { JobService } from './job.service';
 
 @Module({
-    imports: [PrismaModule],
-    providers: [JobService],
-    controllers: [JobController],
-    exports: [JobService],
+  imports: [PrismaModule],
+  providers: [JobService],
+  controllers: [JobController],
+  exports: [JobService],
 })
-export class JobModule { }
+export class JobModule {}

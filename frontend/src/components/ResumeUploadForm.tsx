@@ -13,7 +13,7 @@ import {
   Text,
   Textarea,
   useToast,
-  VStack
+  VStack,
 } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 // PDF extraction will be handled server-side or with a different approach
@@ -25,7 +25,9 @@ import { z } from 'zod';
 
 const resumeSchema = z.object({
   title: z.string().min(1, 'Title is required'),
-  content: z.string().min(100, 'Resume content must be at least 100 characters'),
+  content: z
+    .string()
+    .min(100, 'Resume content must be at least 100 characters'),
 });
 
 type ResumeFormData = z.infer<typeof resumeSchema>;
@@ -43,13 +45,13 @@ export function ResumeUploadForm() {
     try {
       const formData = new FormData();
       formData.append('file', file);
-      
+
       const response = await apiClient.post('/resumes/extract-pdf', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
-      
+
       // Check if there's an error in the response
       if (response.data.error) {
         console.log('PDF extraction error:', response.data.error);
@@ -59,9 +61,9 @@ export function ResumeUploadForm() {
         }
         throw new Error(response.data.error);
       }
-      
+
       const extractedText = response.data.text;
-      
+
       if (extractedText && extractedText.length > 50) {
         return extractedText;
       } else {
@@ -73,7 +75,9 @@ ${extractedText || 'No text could be extracted from this PDF file.'}`;
       }
     } catch (error) {
       console.error('PDF extraction error:', error);
-      throw new Error('Failed to extract text from PDF. Please add your resume content manually.');
+      throw new Error(
+        'Failed to extract text from PDF. Please add your resume content manually.'
+      );
     }
   };
 
@@ -90,16 +94,17 @@ ${extractedText || 'No text could be extracted from this PDF file.'}`;
     accept: {
       'application/pdf': ['.pdf'],
       'application/msword': ['.doc'],
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+        ['.docx'],
       'text/plain': ['.tex'],
     },
     maxFiles: 1,
-    onDrop: async (acceptedFiles) => {
+    onDrop: async acceptedFiles => {
       const file = acceptedFiles[0];
       if (file) {
         setUploadedFile(file);
         setValue('title', file.name.replace(/\.[^/.]+$/, ''));
-        
+
         // Handle PDF files
         if (file.type === 'application/pdf') {
           setIsExtracting(true);
@@ -108,7 +113,8 @@ ${extractedText || 'No text could be extracted from this PDF file.'}`;
             setValue('content', extractedText);
             toast({
               title: 'PDF Text Extracted Successfully!',
-              description: 'Text has been extracted from your PDF. Please review and edit if needed.',
+              description:
+                'Text has been extracted from your PDF. Please review and edit if needed.',
               status: 'success',
               duration: 5000,
               isClosable: true,
@@ -118,7 +124,8 @@ ${extractedText || 'No text could be extracted from this PDF file.'}`;
             setValue('content', 'Resume content extracted from file...');
             toast({
               title: 'PDF Extraction Failed',
-              description: 'Could not extract text from PDF. Please add your resume content manually.',
+              description:
+                'Could not extract text from PDF. Please add your resume content manually.',
               status: 'error',
               duration: 5000,
               isClosable: true,
@@ -134,7 +141,8 @@ ${extractedText || 'No text could be extracted from this PDF file.'}`;
             setValue('content', latexContent);
             toast({
               title: 'LaTeX File Loaded Successfully!',
-              description: 'LaTeX content has been loaded. You can edit it before saving.',
+              description:
+                'LaTeX content has been loaded. You can edit it before saving.',
               status: 'success',
               duration: 5000,
               isClosable: true,
@@ -163,14 +171,17 @@ ${extractedText || 'No text could be extracted from this PDF file.'}`;
   const testApiConnection = async () => {
     console.log('=== Testing API Connection ===');
     console.log('API Base URL:', apiConfig.baseURL);
-    console.log('Environment:', apiConfig.isDevelopment ? 'Development' : 'Production');
-    
+    console.log(
+      'Environment:',
+      apiConfig.isDevelopment ? 'Development' : 'Production'
+    );
+
     try {
       // Test profile endpoint with authenticated client
       console.log('Testing profile endpoint with authenticated client...');
       const profileResponse = await apiClient.get('/user/profile');
       console.log('✅ Profile endpoint successful:', profileResponse.data);
-      
+
       toast({
         title: 'API Connection Test',
         description: 'Successfully connected to backend!',
@@ -187,12 +198,12 @@ ${extractedText || 'No text could be extracted from this PDF file.'}`;
         url: error.config?.url,
         baseURL: error.config?.baseURL,
       });
-      
+
       let errorMessage = error.message || 'Cannot connect to backend';
       if (error.response?.status) {
         errorMessage = `HTTP ${error.response.status}: ${errorMessage}`;
       }
-      
+
       toast({
         title: 'API Connection Test Failed',
         description: errorMessage,
@@ -206,10 +217,13 @@ ${extractedText || 'No text could be extracted from this PDF file.'}`;
   const onSubmit = async (data: ResumeFormData) => {
     console.log('=== Resume Upload Form Submission ===');
     console.log('API Base URL:', apiConfig.baseURL);
-    console.log('Environment:', apiConfig.isDevelopment ? 'Development' : 'Production');
+    console.log(
+      'Environment:',
+      apiConfig.isDevelopment ? 'Development' : 'Production'
+    );
     console.log('Form data:', data);
     console.log('Uploaded file:', uploadedFile);
-    
+
     setIsUploading(true);
     try {
       const formData = new FormData();
@@ -250,7 +264,7 @@ ${extractedText || 'No text could be extracted from this PDF file.'}`;
       console.error('Error response:', error.response?.data);
       console.error('Error status:', error.response?.status);
       console.error('Error config:', error.config);
-      
+
       // Show more detailed error message
       let errorMessage = 'Please try again later.';
       if (error.response?.data?.message) {
@@ -258,11 +272,13 @@ ${extractedText || 'No text could be extracted from this PDF file.'}`;
       } else if (error.message) {
         errorMessage = error.message;
       } else if (error.code === 'ECONNREFUSED') {
-        errorMessage = 'Cannot connect to backend server. Please check if the backend is running.';
+        errorMessage =
+          'Cannot connect to backend server. Please check if the backend is running.';
       } else if (error.code === 'ETIMEDOUT') {
-        errorMessage = 'Request timed out. The server may be slow or unresponsive.';
+        errorMessage =
+          'Request timed out. The server may be slow or unresponsive.';
       }
-      
+
       toast({
         title: 'Error uploading resume',
         description: errorMessage,
@@ -276,17 +292,17 @@ ${extractedText || 'No text could be extracted from this PDF file.'}`;
   };
 
   return (
-    <Box w="full">
+    <Box w='full'>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <VStack spacing={8} align="stretch">
+        <VStack spacing={8} align='stretch'>
           <FormControl>
-            <FormLabel 
-              fontSize="lg" 
-              fontWeight="700" 
-              color="gray.800" 
+            <FormLabel
+              fontSize='lg'
+              fontWeight='700'
+              color='gray.800'
               mb={4}
-              display="flex"
-              alignItems="center"
+              display='flex'
+              alignItems='center'
               gap={2}
             >
               <FiUploadCloud size={20} />
@@ -294,12 +310,12 @@ ${extractedText || 'No text could be extracted from this PDF file.'}`;
             </FormLabel>
             <Box
               {...getRootProps()}
-              border="3px dashed"
+              border='3px dashed'
               borderColor={isDragActive ? 'brand.400' : 'gray.300'}
-              borderRadius="2xl"
+              borderRadius='2xl'
               p={12}
-              textAlign="center"
-              cursor="pointer"
+              textAlign='center'
+              cursor='pointer'
               bg={isDragActive ? 'brand.50' : 'gray.50'}
               sx={{
                 transition: 'all 0.3s ease',
@@ -316,21 +332,22 @@ ${extractedText || 'No text could be extracted from this PDF file.'}`;
                 <VStack spacing={4}>
                   <Box
                     p={4}
-                    bg="green.100"
-                    borderRadius="full"
-                    color="green.600"
+                    bg='green.100'
+                    borderRadius='full'
+                    color='green.600'
                   >
                     <FiCheck size={32} />
                   </Box>
                   <VStack spacing={2}>
-                    <HStack spacing={2} align="center">
+                    <HStack spacing={2} align='center'>
                       <FiFile size={18} />
-                      <Text fontWeight="700" fontSize="lg" color="gray.800">
+                      <Text fontWeight='700' fontSize='lg' color='gray.800'>
                         {uploadedFile.name}
                       </Text>
                     </HStack>
-                    <Text fontSize="sm" color="gray.500" fontWeight="500">
-                      {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB • File uploaded successfully
+                    <Text fontSize='sm' color='gray.500' fontWeight='500'>
+                      {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB • File
+                      uploaded successfully
                     </Text>
                   </VStack>
                 </VStack>
@@ -338,21 +355,21 @@ ${extractedText || 'No text could be extracted from this PDF file.'}`;
                 <VStack spacing={4}>
                   <Box
                     p={4}
-                    bg="brand.100"
-                    borderRadius="full"
-                    color="brand.600"
+                    bg='brand.100'
+                    borderRadius='full'
+                    color='brand.600'
                   >
                     <FiUploadCloud size={32} />
                   </Box>
                   <VStack spacing={2}>
-                    <Text fontSize="lg" fontWeight="600" color="gray.800">
+                    <Text fontSize='lg' fontWeight='600' color='gray.800'>
                       {isExtracting
                         ? 'Extracting text from PDF...'
                         : isDragActive
-                        ? 'Drop the file here...'
-                        : 'Drag & drop your resume here, or click to select'}
+                          ? 'Drop the file here...'
+                          : 'Drag & drop your resume here, or click to select'}
                     </Text>
-                    <Text fontSize="sm" color="gray.500" fontWeight="500">
+                    <Text fontSize='sm' color='gray.500' fontWeight='500'>
                       {isExtracting
                         ? 'Please wait while we extract the text content'
                         : 'Supports PDF, DOC, DOCX, and LaTeX (.tex) files up to 10MB'}
@@ -364,13 +381,13 @@ ${extractedText || 'No text could be extracted from this PDF file.'}`;
           </FormControl>
 
           <FormControl isInvalid={!!errors.title}>
-            <FormLabel 
-              fontSize="lg" 
-              fontWeight="700" 
-              color="gray.800" 
+            <FormLabel
+              fontSize='lg'
+              fontWeight='700'
+              color='gray.800'
               mb={4}
-              display="flex"
-              alignItems="center"
+              display='flex'
+              alignItems='center'
               gap={3}
               ml={2}
             >
@@ -379,17 +396,17 @@ ${extractedText || 'No text could be extracted from this PDF file.'}`;
             </FormLabel>
             <Input
               {...register('title')}
-              placeholder="e.g.,  Software Engineer Resume  •  Marketing Manager CV  •  Data Scientist Profile"
-              size="lg"
-              h="60px"
-              borderRadius="xl"
-              border="2px solid"
-              borderColor="gray.200"
-              bg="white"
+              placeholder='e.g.,  Software Engineer Resume  •  Marketing Manager CV  •  Data Scientist Profile'
+              size='lg'
+              h='60px'
+              borderRadius='xl'
+              border='2px solid'
+              borderColor='gray.200'
+              bg='white'
               ml={6}
               mr={6}
               px={6}
-              width={"32%"}
+              width={'32%'}
               _hover={{
                 borderColor: 'brand.300',
               }}
@@ -397,38 +414,46 @@ ${extractedText || 'No text could be extracted from this PDF file.'}`;
                 borderColor: 'brand.400',
                 boxShadow: '0 0 0 3px rgba(0, 136, 255, 0.1)',
               }}
-              fontSize="md"
-              fontWeight="500"
+              fontSize='md'
+              fontWeight='500'
               _placeholder={{
                 color: 'gray.400',
                 fontSize: 'md',
               }}
             />
-            <FormErrorMessage ml={6} fontSize="sm" fontWeight="500">
+            <FormErrorMessage ml={6} fontSize='sm' fontWeight='500'>
               {errors.title?.message}
             </FormErrorMessage>
           </FormControl>
 
           <FormControl isInvalid={!!errors.content}>
-            <FormLabel 
-              fontSize="lg" 
-              fontWeight="700" 
-              color="gray.800" 
+            <FormLabel
+              fontSize='lg'
+              fontWeight='700'
+              color='gray.800'
               mb={4}
-              display="flex"
-              alignItems="center"
+              display='flex'
+              alignItems='center'
               gap={3}
               ml={2}
             >
               <FiFile size={20} />
               Resume Content
             </FormLabel>
-            <Text ml={6} fontSize="sm" color="gray.600" mb={4} fontWeight="500" lineHeight="1.6">
-              Paste your resume content here or upload a file above. Include all your experience, skills, and achievements.
+            <Text
+              ml={6}
+              fontSize='sm'
+              color='gray.600'
+              mb={4}
+              fontWeight='500'
+              lineHeight='1.6'
+            >
+              Paste your resume content here or upload a file above. Include all
+              your experience, skills, and achievements.
             </Text>
             <Textarea
               {...register('content')}
-              placeholder="Paste your resume content here or upload a file above...
+              placeholder='Paste your resume content here or upload a file above...
 
 Example:
 JOHN DOE
@@ -445,17 +470,17 @@ Software Engineer | ABC Company | 2020-Present
 • Developed and maintained web applications using React and Node.js
 • Collaborated with cross-functional teams to deliver high-quality software
 • Improved application performance by 30% through optimization techniques
-..."
+...'
               rows={12}
-              borderRadius="xl"
-              border="2px solid"
-              borderColor="gray.200"
-              bg="white"
+              borderRadius='xl'
+              border='2px solid'
+              borderColor='gray.200'
+              bg='white'
               ml={6}
               mr={6}
               px={6}
               py={4}
-              width={"85%"}
+              width={'85%'}
               _hover={{
                 borderColor: 'brand.300',
               }}
@@ -463,33 +488,33 @@ Software Engineer | ABC Company | 2020-Present
                 borderColor: 'brand.400',
                 boxShadow: '0 0 0 3px rgba(0, 136, 255, 0.1)',
               }}
-              fontSize="md"
-              fontWeight="500"
-              resize="vertical"
-              minH="280px"
+              fontSize='md'
+              fontWeight='500'
+              resize='vertical'
+              minH='280px'
               _placeholder={{
                 color: 'gray.400',
                 fontSize: 'sm',
                 lineHeight: '1.5',
               }}
             />
-            <FormErrorMessage ml={6} fontSize="sm" fontWeight="500">
+            <FormErrorMessage ml={6} fontSize='sm' fontWeight='500'>
               {errors.content?.message}
             </FormErrorMessage>
           </FormControl>
 
           <Button
-            type="submit"
-            size="lg"
+            type='submit'
+            size='lg'
             isLoading={isUploading}
-            loadingText="Uploading..."
-            h="56px"
-            borderRadius="xl"
-            fontSize="lg"
-            fontWeight="700"
-            bg="linear-gradient(135deg, #0088ff 0%, #0066cc 100%)"
-            color="white"
-            border="none"
+            loadingText='Uploading...'
+            h='56px'
+            borderRadius='xl'
+            fontSize='lg'
+            fontWeight='700'
+            bg='linear-gradient(135deg, #0088ff 0%, #0066cc 100%)'
+            color='white'
+            border='none'
             ml={6}
             mr={6}
             sx={{
