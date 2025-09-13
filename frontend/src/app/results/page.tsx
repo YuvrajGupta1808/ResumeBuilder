@@ -68,7 +68,7 @@ export default function ResultsPage() {
                         <Heading 
                           size="xl" 
                           fontWeight={700}
-                          bgGradient="linear(to-r, gray.800, brand.600)"
+                          bg="linear(to-r, gray.800, brand.600)"
                           bgClip="text"
                         >
                           Tailored Results
@@ -143,10 +143,16 @@ export default function ResultsPage() {
                     </Button>
                     <Button
                       leftIcon={<FiDownload />}
-                      bgGradient="linear(to-r, brand.400, brand.600)"
+                      bg="linear(to-r, brand.400, brand.600)"
                       color="white"
+                      onClick={() => {
+                        const jobHistoryId = new URLSearchParams(window.location.search).get('jobHistoryId');
+                        if (jobHistoryId) {
+                          window.location.href = `/download?jobHistoryId=${jobHistoryId}`;
+                        }
+                      }}
                       _hover={{
-                        bgGradient: "linear(to-r, brand.500, brand.700)",
+                        bg: "linear(to-r, brand.500, brand.700)",
                         transform: "translateY(-1px)",
                         boxShadow: "lg",
                       }}

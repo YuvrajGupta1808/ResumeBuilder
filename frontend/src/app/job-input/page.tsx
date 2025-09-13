@@ -1,5 +1,5 @@
+import { AppLayout } from '@/components/AppLayout';
 import { JobInputForm } from '@/components/JobInputForm';
-import { Navbar } from '@/components/Navbar';
 import {
   Alert,
   AlertDescription,
@@ -21,9 +21,8 @@ import { FiBriefcase, FiFileText, FiHome, FiTarget, FiZap } from 'react-icons/fi
 
 export default function JobInputPage() {
   return (
-    <Box bg="linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)" minH="100vh">
-      <Navbar />
-      <Box display="flex">
+    <AppLayout>
+      <Box bg="linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)" display="flex">
         <Box flex="1" p={8}>
           <Container maxW="container.lg" mx="auto" className="centered-content">
             <VStack align="start" spacing={8} className="fade-in">
@@ -390,6 +389,6 @@ export default function JobInputPage() {
           </Container>
         </Box>
       </Box>
-    </Box>
+    </AppLayout>
   );
 }

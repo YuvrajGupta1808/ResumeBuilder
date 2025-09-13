@@ -71,8 +71,8 @@ export function Footer() {
               <Link href="/dashboard" _hover={{ color: "brand.400" }}>
                 Dashboard
               </Link>
-              <Link href="/results" _hover={{ color: "brand.400" }}>
-                Results
+              <Link href="/download" _hover={{ color: "brand.400" }}>
+                Downloads
               </Link>
             </VStack>
           </VStack>
@@ -106,11 +106,11 @@ export function Footer() {
             <VStack align="start" spacing={3}>
               <HStack spacing={3}>
                 <FiMail color="brand.400" />
-                <Text fontSize="sm">support@aijobassistant.com</Text>
+                <Text fontSize="sm">yuvrajgupta1808@gmail.com</Text>
               </HStack>
               <HStack spacing={3}>
                 <FiPhone color="brand.400" />
-                <Text fontSize="sm">+1 (555) 123-4567</Text>
+                <Text fontSize="sm">+1 (415) 740-8804</Text>
               </HStack>
               <HStack spacing={3}>
                 <FiMapPin color="brand.400" />
@@ -129,7 +129,7 @@ export function Footer() {
           spacing={4}
         >
           <Text fontSize="sm" color="gray.400">
-            © 2024 AI Job Application Assistant. All rights reserved.
+            © 2025 AI Job Application Assistant. All rights reserved.
           </Text>
           <HStack spacing={6}>
             <Link href="#" fontSize="sm" _hover={{ color: "brand.400" }}>

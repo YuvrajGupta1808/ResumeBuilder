@@ -37,6 +37,8 @@ export class JobController {
     @Get(':id')
     @ApiOperation({ summary: 'Get job history by ID' })
     findOne(@Param('id') id: string, @Request() req) {
+        console.log('Getting job history for ID:', id);
+        console.log('User ID:', req.user.id);
         return this.jobService.findOne(id, req.user.id);
     }
 

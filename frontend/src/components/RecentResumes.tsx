@@ -3,15 +3,15 @@
 import { useApiClient } from '@/lib/api-client';
 import { Resume } from '@/types';
 import {
-  Badge,
   Box,
+  Button,
   Heading,
   HStack,
   Text,
-  VStack,
+  VStack
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
-import { FiCalendar, FiFileText } from 'react-icons/fi';
+import { FiCalendar, FiEye, FiFileText } from 'react-icons/fi';
 
 export function RecentResumes() {
   const apiClient = useApiClient();
@@ -35,6 +35,44 @@ export function RecentResumes() {
     }
   };
 
+  const viewResume = (resume: Resume) => {
+    // Create a new window/tab to view the resume content
+    const newWindow = window.open('', '_blank');
+    if (newWindow) {
+      newWindow.document.write(`
+        <html>
+          <head>
+            <title>${resume.title}</title>
+            <style>
+              body { 
+                font-family: Arial, sans-serif; 
+                max-width: 800px; 
+                margin: 0 auto; 
+                padding: 20px; 
+                line-height: 1.6;
+              }
+              pre { 
+                white-space: pre-wrap; 
+                word-wrap: break-word; 
+                background: #f5f5f5; 
+                padding: 20px; 
+                border-radius: 8px;
+                border: 1px solid #ddd;
+              }
+            </style>
+          </head>
+          <body>
+            <h1>${resume.title}</h1>
+            <p><strong>Created:</strong> ${new Date(resume.createdAt).toLocaleDateString()}</p>
+            <hr>
+            <pre>${resume.content}</pre>
+          </body>
+        </html>
+      `);
+      newWindow.document.close();
+    }
+  };
+
   if (loading) {
     return (
       <Box
@@ -55,7 +93,7 @@ export function RecentResumes() {
       border="1px"
       borderColor={borderColor}
       borderRadius="lg"
-      p={6}
+      p={4}
     >
       <VStack align="start" spacing={4}>
         <Heading size="md">Recent Resumes</Heading>
@@ -69,7 +107,7 @@ export function RecentResumes() {
             {resumes.map((resume) => (
               <Box
                 key={resume.id}
-                p={3}
+                p={2}
                 border="1px"
                 borderColor={borderColor}
                 borderRadius="md"
@@ -92,9 +130,15 @@ export function RecentResumes() {
                       </HStack>
                     </VStack>
                   </HStack>
-                  <Badge colorScheme="green" fontSize="xs">
-                    Ready
-                  </Badge>
+                  <Button
+                    size="xs"
+                    variant="ghost"
+                    leftIcon={<FiEye />}
+                    onClick={() => viewResume(resume)}
+                    colorScheme="blue"
+                  >
+                    View
+                  </Button>
                 </HStack>
               </Box>
             ))}

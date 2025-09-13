@@ -1,6 +1,6 @@
 'use client';
 
-import { api } from '@/lib/api';
+import { useApiClient } from '@/lib/api-client';
 import { Resume } from '@/types';
 import {
   Box,
@@ -35,6 +35,7 @@ export function JobInputForm() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [resumes, setResumes] = useState<Resume[]>([]);
   const toast = useToast();
+  const apiClient = useApiClient();
 
   const {
     register,
@@ -46,11 +47,11 @@ export function JobInputForm() {
 
   useEffect(() => {
     fetchResumes();
-  }, []);
+  }, [apiClient]);
 
   const fetchResumes = async () => {
     try {
-      const response = await api.get('/resumes');
+      const response = await apiClient.get('/resumes');
       setResumes(response.data);
     } catch (error) {
       toast({
@@ -66,7 +67,9 @@ export function JobInputForm() {
   const onSubmit = async (data: JobInputFormData) => {
     setIsProcessing(true);
     try {
-      const response = await api.post('/ai/tailor-resume', data);
+      // First, tailor the resume with AI
+      const response = await apiClient.post('/ai/tailor-resume', data);
+      console.log('AI tailoring response:', response.data);
       
       toast({
         title: 'Resume tailored successfully!',
@@ -76,8 +79,9 @@ export function JobInputForm() {
         isClosable: true,
       });
 
-      // Redirect to results page
-      window.location.href = `/results?jobHistoryId=${response.data.jobHistoryId}`;
+      // Redirect to download page
+      console.log('Redirecting to download page with jobHistoryId:', response.data.jobHistoryId);
+      window.location.href = `/download?jobHistoryId=${response.data.jobHistoryId}`;
     } catch (error) {
       toast({
         title: 'Error processing request',
@@ -90,6 +94,7 @@ export function JobInputForm() {
       setIsProcessing(false);
     }
   };
+
 
   return (
     <Box w="full">

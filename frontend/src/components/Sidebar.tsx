@@ -1,27 +1,27 @@
 'use client';
 
 import {
-  Box,
-  HStack,
-  Text,
-  VStack
+    Box,
+    HStack,
+    Text,
+    VStack
 } from '@chakra-ui/react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  FiFileText,
-  FiHome,
-  FiSettings,
-  FiTrendingUp,
-  FiUpload,
+    FiFileText,
+    FiHome,
+    FiSettings,
+    FiTrendingUp,
+    FiUpload,
 } from 'react-icons/fi';
 
 const menuItems = [
   { name: 'Dashboard', href: '/dashboard', icon: FiHome },
   { name: 'Upload Resume', href: '/resume-upload', icon: FiUpload },
   { name: 'Job Input', href: '/job-input', icon: FiFileText },
-  { name: 'Results', href: '/results', icon: FiTrendingUp },
+  { name: 'Downloads', href: '/download', icon: FiTrendingUp },
   { name: 'Settings', href: '/settings', icon: FiSettings },
 ];
 

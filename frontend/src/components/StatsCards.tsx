@@ -2,13 +2,13 @@
 
 import { useApiClient } from '@/lib/api-client';
 import {
-    Box,
-    SimpleGrid,
-    Stat,
-    StatArrow,
-    StatHelpText,
-    StatLabel,
-    StatNumber,
+  Box,
+  SimpleGrid,
+  Stat,
+  StatArrow,
+  StatHelpText,
+  StatLabel,
+  StatNumber,
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 
@@ -56,7 +56,7 @@ export function StatsCards() {
             border="1px"
             borderColor={borderColor}
             borderRadius="lg"
-            p={6}
+            p={4}
           >
             <Box h="20" bg="gray.200" borderRadius="md" />
           </Box>
@@ -72,13 +72,13 @@ export function StatsCards() {
         border="1px"
         borderColor={borderColor}
         borderRadius="lg"
-        p={6}
+        p={4}
       >
         <Stat>
           <StatLabel>Total Resumes</StatLabel>
           <StatNumber>{stats.totalResumes}</StatNumber>
-          <StatHelpText>
-            <StatArrow type="increase" />
+          <StatHelpText fontSize="xs">
+            <StatArrow type="increase" boxSize="6px" />
             Active resumes
           </StatHelpText>
         </Stat>
@@ -89,13 +89,13 @@ export function StatsCards() {
         border="1px"
         borderColor={borderColor}
         borderRadius="lg"
-        p={6}
+        p={4}
       >
         <Stat>
           <StatLabel>Applications Sent</StatLabel>
           <StatNumber>{stats.totalApplications}</StatNumber>
-          <StatHelpText>
-            <StatArrow type="increase" />
+          <StatHelpText fontSize="xs">
+            <StatArrow type="increase" boxSize="6px" />
             This month: {stats.thisMonthApplications}
           </StatHelpText>
         </Stat>
@@ -106,13 +106,13 @@ export function StatsCards() {
         border="1px"
         borderColor={borderColor}
         borderRadius="lg"
-        p={6}
+        p={4}
       >
         <Stat>
           <StatLabel>Success Rate</StatLabel>
           <StatNumber>{stats.successRate}%</StatNumber>
-          <StatHelpText>
-            <StatArrow type="increase" />
+          <StatHelpText fontSize="xs">
+            <StatArrow type="increase" boxSize="6px" />
             Response rate
           </StatHelpText>
         </Stat>
@@ -123,13 +123,13 @@ export function StatsCards() {
         border="1px"
         borderColor={borderColor}
         borderRadius="lg"
-        p={6}
+        p={4}
       >
         <Stat>
           <StatLabel>Time Saved</StatLabel>
           <StatNumber>24h</StatNumber>
-          <StatHelpText>
-            <StatArrow type="increase" />
+          <StatHelpText fontSize="xs">
+            <StatArrow type="increase" boxSize="6px" />
             This month
           </StatHelpText>
         </Stat>

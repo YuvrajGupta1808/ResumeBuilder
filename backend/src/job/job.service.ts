@@ -9,12 +9,18 @@ export class JobService {
     constructor(private prisma: PrismaService) { }
 
     async create(createJobHistoryDto: CreateJobHistoryDto, userId: string): Promise<JobHistory> {
-        return this.prisma.jobHistory.create({
+        console.log('Creating job history with data:', createJobHistoryDto);
+        console.log('User ID:', userId);
+
+        const result = await this.prisma.jobHistory.create({
             data: {
                 ...createJobHistoryDto,
                 userId,
             },
         });
+
+        console.log('Created job history:', result);
+        return result;
     }
 
     async findAll(userId: string): Promise<JobHistory[]> {
@@ -28,12 +34,17 @@ export class JobService {
     }
 
     async findOne(id: string, userId: string): Promise<JobHistory | null> {
-        return this.prisma.jobHistory.findFirst({
+        console.log('Finding job history with ID:', id, 'for user:', userId);
+
+        const result = await this.prisma.jobHistory.findFirst({
             where: { id, userId },
             include: {
                 resume: true,
             },
         });
+
+        console.log('Found job history:', result);
+        return result;
     }
 
     async update(id: string, updateJobHistoryDto: UpdateJobHistoryDto, userId: string): Promise<JobHistory> {

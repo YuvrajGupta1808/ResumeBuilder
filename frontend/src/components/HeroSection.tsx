@@ -252,7 +252,7 @@ export function HeroSection() {
                 <Text
                   fontSize={{ base: '3xl', md: '4xl' }}
                   fontWeight="800"
-                  bgGradient="linear(to-r, brand.500, brand.700)"
+                  bg="linear(to-r, brand.500, brand.700)"
                   bgClip="text"
                   sx={{
                     animation: 'countUp 2s ease-out forwards',
@@ -279,7 +279,7 @@ export function HeroSection() {
                 <Text
                   fontSize={{ base: '3xl', md: '4xl' }}
                   fontWeight="800"
-                  bgGradient="linear(to-r, success.500, success.600)"
+                  bg="linear(to-r, success.500, success.600)"
                   bgClip="text"
                   sx={{
                     animation: 'countUp 2s ease-out 0.2s forwards',
@@ -306,7 +306,7 @@ export function HeroSection() {
                 <Text
                   fontSize={{ base: '3xl', md: '4xl' }}
                   fontWeight="800"
-                  bgGradient="linear(to-r, warning.500, warning.600)"
+                  bg="linear(to-r, warning.500, warning.600)"
                   bgClip="text"
                   sx={{
                     animation: 'countUp 2s ease-out 0.4s forwards',

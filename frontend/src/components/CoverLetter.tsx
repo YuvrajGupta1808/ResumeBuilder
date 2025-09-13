@@ -9,9 +9,10 @@ import {
     Heading,
     HStack,
     Text,
-    
+    useToast,
     VStack,
 } from '@chakra-ui/react';
+import jsPDF from 'jspdf';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { FiCopy, FiDownload, FiEdit } from 'react-icons/fi';
@@ -19,8 +20,10 @@ import { FiCopy, FiDownload, FiEdit } from 'react-icons/fi';
 export function CoverLetter() {
   const [jobHistory, setJobHistory] = useState<JobHistory | null>(null);
   const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState(false);
   const searchParams = useSearchParams();
   const jobHistoryId = searchParams.get('jobHistoryId');
+  const toast = useToast();
   const bg = 'white';
   const borderColor = 'gray.200';
 
@@ -41,7 +44,65 @@ export function CoverLetter() {
     }
   };
 
-  const handleDownload = () => {
+  const handleDownloadPDF = async () => {
+    if (!jobHistory) return;
+    
+    setDownloading(true);
+    try {
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const margin = 20;
+      const maxWidth = pageWidth - (margin * 2);
+      
+      // Add title
+      doc.setFontSize(18);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Cover Letter', margin, margin + 10);
+      
+      // Add job info
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`${jobHistory.jobTitle} at ${jobHistory.company}`, margin, margin + 25);
+      
+      // Add content
+      doc.setFontSize(10);
+      const lines = doc.splitTextToSize(jobHistory.coverLetter, maxWidth);
+      let yPosition = margin + 40;
+      
+      lines.forEach((line: string) => {
+        if (yPosition > pageHeight - margin) {
+          doc.addPage();
+          yPosition = margin;
+        }
+        doc.text(line, margin, yPosition);
+        yPosition += 6;
+      });
+      
+      doc.save(`${jobHistory.jobTitle}-cover-letter.pdf`);
+      
+      toast({
+        title: 'Cover letter downloaded!',
+        description: 'Your cover letter has been downloaded as a PDF.',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast({
+        title: 'Download failed',
+        description: 'Failed to generate PDF. Please try again.',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  const handleDownloadTXT = () => {
     if (jobHistory) {
       const element = document.createElement('a');
       const file = new Blob([jobHistory.coverLetter], { type: 'text/plain' });
@@ -122,11 +183,21 @@ export function CoverLetter() {
             </Button>
             <Button
               leftIcon={<FiDownload />}
-              colorScheme="brand"
+              colorScheme="green"
               size="sm"
-              onClick={handleDownload}
+              onClick={handleDownloadPDF}
+              isLoading={downloading}
+              loadingText="Generating..."
             >
-              Download
+              PDF
+            </Button>
+            <Button
+              leftIcon={<FiDownload />}
+              variant="outline"
+              size="sm"
+              onClick={handleDownloadTXT}
+            >
+              TXT
             </Button>
           </HStack>
         </HStack>

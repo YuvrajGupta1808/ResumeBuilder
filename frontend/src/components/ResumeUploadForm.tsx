@@ -1,6 +1,7 @@
 'use client';
 
-import { api, apiConfig } from '@/lib/api';
+import { apiConfig } from '@/lib/api';
+import { useApiClient } from '@/lib/api-client';
 import {
   Box,
   Button,
@@ -15,6 +16,7 @@ import {
   VStack
 } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
+// PDF extraction will be handled server-side or with a different approach
 import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useForm } from 'react-hook-form';
@@ -31,8 +33,49 @@ type ResumeFormData = z.infer<typeof resumeSchema>;
 export function ResumeUploadForm() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [isExtracting, setIsExtracting] = useState(false);
   const toast = useToast();
   const borderColor = 'gray.300';
+  const apiClient = useApiClient();
+
+  // Function to extract text from PDF using server-side extraction
+  const extractTextFromPDF = async (file: File): Promise<string> => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const response = await apiClient.post('/resumes/extract-pdf', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
+      // Check if there's an error in the response
+      if (response.data.error) {
+        console.log('PDF extraction error:', response.data.error);
+        // Return the fallback text if available, otherwise throw error
+        if (response.data.text) {
+          return response.data.text;
+        }
+        throw new Error(response.data.error);
+      }
+      
+      const extractedText = response.data.text;
+      
+      if (extractedText && extractedText.length > 50) {
+        return extractedText;
+      } else {
+        return `PDF file uploaded: ${file.name}
+
+Note: Limited text was extracted from this PDF. Please review and add any missing content manually.
+
+${extractedText || 'No text could be extracted from this PDF file.'}`;
+      }
+    } catch (error) {
+      console.error('PDF extraction error:', error);
+      throw new Error('Failed to extract text from PDF. Please add your resume content manually.');
+    }
+  };
 
   const {
     register,
@@ -48,16 +91,71 @@ export function ResumeUploadForm() {
       'application/pdf': ['.pdf'],
       'application/msword': ['.doc'],
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+      'text/plain': ['.tex'],
     },
     maxFiles: 1,
     onDrop: async (acceptedFiles) => {
       const file = acceptedFiles[0];
       if (file) {
         setUploadedFile(file);
-        // In a real app, you'd extract text from the file here
-        // For now, we'll just set a placeholder
-        setValue('content', 'Resume content extracted from file...');
         setValue('title', file.name.replace(/\.[^/.]+$/, ''));
+        
+        // Handle PDF files
+        if (file.type === 'application/pdf') {
+          setIsExtracting(true);
+          try {
+            const extractedText = await extractTextFromPDF(file);
+            setValue('content', extractedText);
+            toast({
+              title: 'PDF Text Extracted Successfully!',
+              description: 'Text has been extracted from your PDF. Please review and edit if needed.',
+              status: 'success',
+              duration: 5000,
+              isClosable: true,
+            });
+          } catch (error) {
+            console.error('PDF extraction error:', error);
+            setValue('content', 'Resume content extracted from file...');
+            toast({
+              title: 'PDF Extraction Failed',
+              description: 'Could not extract text from PDF. Please add your resume content manually.',
+              status: 'error',
+              duration: 5000,
+              isClosable: true,
+            });
+          } finally {
+            setIsExtracting(false);
+          }
+        } else if (file.name.endsWith('.tex')) {
+          // Handle LaTeX files
+          setIsExtracting(true);
+          try {
+            const latexContent = await file.text();
+            setValue('content', latexContent);
+            toast({
+              title: 'LaTeX File Loaded Successfully!',
+              description: 'LaTeX content has been loaded. You can edit it before saving.',
+              status: 'success',
+              duration: 5000,
+              isClosable: true,
+            });
+          } catch (error) {
+            console.error('LaTeX file reading error:', error);
+            setValue('content', 'LaTeX content loaded from file...');
+            toast({
+              title: 'LaTeX File Reading Failed',
+              description: 'Could not read LaTeX file. Please try again.',
+              status: 'error',
+              duration: 5000,
+              isClosable: true,
+            });
+          } finally {
+            setIsExtracting(false);
+          }
+        } else {
+          // For other files, set placeholder text
+          setValue('content', 'Resume content extracted from file...');
+        }
       }
     },
   });
@@ -68,20 +166,9 @@ export function ResumeUploadForm() {
     console.log('Environment:', apiConfig.isDevelopment ? 'Development' : 'Production');
     
     try {
-      // First test auth endpoint
-      console.log('Testing auth endpoint...');
-      const authResponse = await api.post('/auth/register', {
-        email: 'yuvrajgupta1808@gmail.com',
-        name: 'Yuvraj Gupta'
-      });
-      console.log('✅ Auth endpoint successful:', authResponse.data);
-      
-      // Then test profile endpoint with token
-      const token = authResponse.data.access_token;
-      console.log('Testing profile endpoint with token...');
-      const profileResponse = await api.get('/user/profile', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      // Test profile endpoint with authenticated client
+      console.log('Testing profile endpoint with authenticated client...');
+      const profileResponse = await apiClient.get('/user/profile');
       console.log('✅ Profile endpoint successful:', profileResponse.data);
       
       toast({
@@ -139,7 +226,7 @@ export function ResumeUploadForm() {
       }
 
       console.log('Sending request to /resumes endpoint...');
-      const response = await api.post('/resumes', formData, {
+      const response = await apiClient.post('/resumes', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -259,12 +346,16 @@ export function ResumeUploadForm() {
                   </Box>
                   <VStack spacing={2}>
                     <Text fontSize="lg" fontWeight="600" color="gray.800">
-                      {isDragActive
+                      {isExtracting
+                        ? 'Extracting text from PDF...'
+                        : isDragActive
                         ? 'Drop the file here...'
                         : 'Drag & drop your resume here, or click to select'}
                     </Text>
                     <Text fontSize="sm" color="gray.500" fontWeight="500">
-                      Supports PDF, DOC, DOCX files up to 10MB
+                      {isExtracting
+                        ? 'Please wait while we extract the text content'
+                        : 'Supports PDF, DOC, DOCX, and LaTeX (.tex) files up to 10MB'}
                     </Text>
                   </VStack>
                 </VStack>

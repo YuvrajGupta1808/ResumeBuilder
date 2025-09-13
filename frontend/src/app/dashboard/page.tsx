@@ -1,22 +1,23 @@
 'use client';
 
-import { Navbar } from '@/components/Navbar';
+import { AppLayout } from '@/components/AppLayout';
 import { QuickActions } from '@/components/QuickActions';
+import { RecentJobApplications } from '@/components/RecentJobApplications';
 import { RecentResumes } from '@/components/RecentResumes';
 import { StatsCards } from '@/components/StatsCards';
 import {
-    Badge,
-    Box,
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    Container,
-    Grid,
-    GridItem,
-    Heading,
-    HStack,
-    Text,
-    VStack
+  Badge,
+  Box,
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  Container,
+  Grid,
+  GridItem,
+  Heading,
+  HStack,
+  Text,
+  VStack
 } from '@chakra-ui/react';
 import { useSession } from 'next-auth/react';
 import { FiCalendar, FiHome, FiTrendingUp } from 'react-icons/fi';
@@ -25,9 +26,8 @@ export default function DashboardPage() {
   const { data: session } = useSession();
   
   return (
-    <Box bg="gray.50" minH="100vh">
-      <Navbar />
-      <Box p={8}>
+    <AppLayout>
+      <Box bg="gray.50" p={8}>
           <Container maxW="container.xl" mx="auto" className="centered-content">
             <VStack align="start" spacing={8}>
               {/* Header Section */}
@@ -53,7 +53,7 @@ export default function DashboardPage() {
                     <Heading 
                       size="xl" 
                       fontWeight={700}
-                      bgGradient="linear(to-r, gray.800, brand.600)"
+                      bg="linear(to-r, gray.800, brand.600)"
                       bgClip="text"
                     >
                       Dashboard
@@ -99,7 +99,7 @@ export default function DashboardPage() {
               
               {/* Main Content Grid */}
               <Grid 
-                templateColumns={{ base: '1fr', lg: '2fr 1fr' }} 
+                templateColumns={{ base: '1fr', lg: '1fr 1fr 1fr' }} 
                 gap={8} 
                 w="full"
                 alignItems="start"
@@ -108,12 +108,15 @@ export default function DashboardPage() {
                   <RecentResumes />
                 </GridItem>
                 <GridItem>
+                  <RecentJobApplications />
+                </GridItem>
+                <GridItem>
                   <QuickActions />
                 </GridItem>
               </Grid>
             </VStack>
           </Container>
       </Box>
-    </Box>
+    </AppLayout>
   );
 }

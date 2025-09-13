@@ -20,7 +20,7 @@ export function QuickActions() {
       border="1px"
       borderColor={borderColor}
       borderRadius="lg"
-      p={6}
+      p={4}
     >
       <VStack align="start" spacing={4}>
         <Heading size="md">Quick Actions</Heading>

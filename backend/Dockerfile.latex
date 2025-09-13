@@ -1,0 +1,56 @@
+# Dockerfile for LaTeX compilation with TeXLive
+FROM texlive/texlive:latest
+
+# Install additional packages (most are already included in texlive:latest)
+RUN tlmgr update --self && \
+    tlmgr install \
+    lua-uni-algos || true
+
+# Create working directory
+WORKDIR /workspace
+
+# Create entrypoint script
+RUN echo '#!/bin/bash\n\
+    set -e\n\
+    \n\
+    # Get parameters\n\
+    OUTPUT_DIR=${OUTPUT_DIR:-/workspace/output}\n\
+    MAIN_LATEX_FILE=${MAIN_LATEX_FILE:-main.tex}\n\
+    CTAN_PACKAGES=${CTAN_PACKAGES:-}\n\
+    TOC=${TOC:-false}\n\
+    \n\
+    # Create output directory\n\
+    mkdir -p "$OUTPUT_DIR"\n\
+    \n\
+    # Install additional CTAN packages if specified\n\
+    if [ -n "$CTAN_PACKAGES" ]; then\n\
+    echo "Installing additional packages: $CTAN_PACKAGES"\n\
+    tlmgr install $CTAN_PACKAGES\n\
+    tlmgr path add\n\
+    fi\n\
+    \n\
+    # Compile LaTeX to PDF\n\
+    echo "Compiling $MAIN_LATEX_FILE to PDF..."\n\
+    \n\
+    if [ "$TOC" = "true" ]; then\n\
+    # Compile twice for table of contents\n\
+    lualatex -output-directory="$OUTPUT_DIR" -interaction=nonstopmode "$MAIN_LATEX_FILE"\n\
+    lualatex -output-directory="$OUTPUT_DIR" -interaction=nonstopmode "$MAIN_LATEX_FILE"\n\
+    else\n\
+    # Single compilation\n\
+    lualatex -output-directory="$OUTPUT_DIR" -interaction=nonstopmode "$MAIN_LATEX_FILE"\n\
+    fi\n\
+    \n\
+    # Check if PDF was created\n\
+    PDF_FILE="$OUTPUT_DIR/${MAIN_LATEX_FILE%.tex}.pdf"\n\
+    if [ -f "$PDF_FILE" ]; then\n\
+    echo "PDF successfully created: $PDF_FILE"\n\
+    exit 0\n\
+    else\n\
+    echo "Error: PDF was not created"\n\
+    exit 1\n\
+    fi' > /usr/local/bin/compile-latex.sh && \
+    chmod +x /usr/local/bin/compile-latex.sh
+
+# Set entrypoint
+ENTRYPOINT ["/usr/local/bin/compile-latex.sh"]
