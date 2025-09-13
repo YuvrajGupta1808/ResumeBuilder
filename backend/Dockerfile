@@ -1,6 +1,9 @@
 # Use Node.js 18 LTS
 FROM node:18-alpine
 
+# Install OpenSSL and other dependencies
+RUN apk add --no-cache openssl
+
 # Set working directory
 WORKDIR /app
 
@@ -13,8 +16,8 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Generate Prisma client
-RUN npx prisma generate
+# Generate Prisma client (without database connection)
+RUN npx prisma generate --no-engine
 
 # Build the application
 RUN npm run build
