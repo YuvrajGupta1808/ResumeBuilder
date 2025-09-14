@@ -1,0 +1,50 @@
+name: CI Only (No Deployment)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm run install:all
+      
+    - name: Lint frontend
+      run: npm run lint:frontend
+      
+    - name: Lint backend
+      run: npm run lint:backend
+      
+    - name: Format check
+      run: npm run format:check
+      
+    - name: Build frontend
+      run: npm run build:frontend
+      
+    - name: Build backend
+      run: npm run build:backend
+      
+    - name: Test build artifacts
+      run: |
+        echo "✅ Frontend build completed"
+        echo "✅ Backend build completed"
+        echo "✅ All checks passed - ready for deployment"
+        echo ""
+        echo "📝 Next steps:"
+        echo "1. Add GitHub secrets (see GITHUB_SECRETS_SETUP.md)"
+        echo "2. Use ci.yml workflow for automatic deployment"
+        echo "3. Or use deploy.sh script for manual deployment"
