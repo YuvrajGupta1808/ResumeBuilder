@@ -1,97 +1,167 @@
-# Railway Deployment Troubleshooting
+# Railway Backend Troubleshooting Guide
 
-## Current Issue: Database Connection Error
+## Current Issue: 502 Bad Gateway Errors
 
-The deployment is failing because of Prisma database connection issues. Here's how to fix it:
+### Step 1: Check Railway Deployment Logs
 
-## Solution 1: Use Railway PostgreSQL (Recommended)
+1. Go to your Railway dashboard
+2. Click on your backend project
+3. Go to "Deployments" tab
+4. Click on the latest deployment
+5. Check the "Logs" section for error messages
 
-Instead of using Azure PostgreSQL, use Railway's built-in PostgreSQL:
+### Step 2: Verify Environment Variables
 
-1. **In Railway Dashboard:**
-   - Go to your project
-   - Click "New" → "Database" → "PostgreSQL"
-   - This will create a new PostgreSQL database
+Make sure these are set in Railway:
 
-2. **Update Environment Variables:**
-   - Railway will automatically provide `DATABASE_URL`
-   - Remove the custom `DATABASE_URL` from your environment variables
-   - Railway will use its own database connection
+```bash
+# Database
+DATABASE_URL=postgresql://username:password@host:port/database?sslmode=require
 
-## Solution 2: Fix Azure Database Connection
+# Redis
+REDIS_URL=redis://username:password@host:port
 
-If you want to keep using Azure PostgreSQL:
+# JWT
+JWT_SECRET=your-jwt-secret-key
 
-1. **Update Environment Variables in Railway:**
-   ```
-   DATABASE_URL=postgresql://dbadmin:ResumeBuilder1234@resume-builder-db.postgres.database.azure.com:5432/ai_job_assistant?sslmode=require
-   DIRECT_URL=postgresql://dbadmin:ResumeBuilder1234@resume-builder-db.postgres.database.azure.com:5432/ai_job_assistant?sslmode=require
-   JWT_SECRET=your-super-secure-jwt-secret-for-production-change-this
-   JWT_EXPIRES_IN=7d
-   OPENAI_API_KEY=your-openai-api-key-here
-   PORT=3001
-   NODE_ENV=production
-   CORS_ORIGIN=https://your-frontend-domain.vercel.app
-   THROTTLE_TTL=60
-   THROTTLE_LIMIT=100
-   MAX_FILE_SIZE=10485760
-   UPLOAD_DEST=./uploads
-   REDIS_URL=redis://default:AfWlAAIncDEyYzg5NDNiNzQzMGM0MTg1OGExZDZkMTNjYTM0OWRkYXAxNjI4ODU@obliging-mosquito-62885.upstash.io:6379
-   ```
+# OpenAI
+OPENAI_API_KEY=your-openai-api-key
 
-2. **Check Azure Database Settings:**
-   - Ensure the database allows connections from Railway's IP ranges
-   - Check if the database is accessible from external connections
-   - Verify the connection string is correct
+# CORS
+CORS_ORIGIN=https://frontend-lxbow585y-yuvrajgupta1808s-projects.vercel.app
 
-## Solution 3: Alternative Database Options
-
-### Option A: Supabase (Free)
-1. Go to [Supabase.com](https://supabase.com)
-2. Create a new project
-3. Get the connection string from Settings → Database
-4. Use as `DATABASE_URL` in Railway
-
-### Option B: Neon (Free)
-1. Go to [Neon.tech](https://neon.tech)
-2. Create a new project
-3. Get the connection string
-4. Use as `DATABASE_URL` in Railway
-
-## Quick Fix Steps:
-
-1. **Stop the current deployment** in Railway
-2. **Add a Railway PostgreSQL database:**
-   - In Railway dashboard → New → Database → PostgreSQL
-3. **Update environment variables:**
-   - Remove custom `DATABASE_URL`
-   - Railway will auto-provide the database URL
-4. **Redeploy** your application
-
-## Environment Variables for Railway:
-
-```
-JWT_SECRET=your-super-secure-jwt-secret-for-production-change-this
-JWT_EXPIRES_IN=7d
-OPENAI_API_KEY=your-openai-api-key-here
+# Port
 PORT=3001
-NODE_ENV=production
-CORS_ORIGIN=https://your-frontend-domain.vercel.app
+
+# Throttling
 THROTTLE_TTL=60
-THROTTLE_LIMIT=100
+THROTTLE_LIMIT=10
+
+# File Upload
 MAX_FILE_SIZE=10485760
 UPLOAD_DEST=./uploads
-REDIS_URL=redis://default:AfWlAAIncDEyYzg5NDNiNzQzMGM0MTg1OGExZDZkMTNjYTM0OWRkYXAxNjI4ODU@obliging-mosquito-62885.upstash.io:6379
 ```
 
-## After Fixing Database:
+### Step 3: Check Database Connection
 
-1. The deployment should complete successfully
-2. Your backend will be available at: `https://your-railway-app.railway.app`
-3. Update your frontend's `NEXT_PUBLIC_API_URL` to point to this URL
+The 502 error might be due to database connection issues. Verify:
 
-## Testing the Deployment:
+1. **Azure PostgreSQL is accessible** from Railway
+2. **Connection string is correct**
+3. **Database exists and is running**
+4. **SSL is properly configured**
 
-Once deployed, test these endpoints:
-- `GET https://your-railway-app.railway.app/api/health`
-- `GET https://your-railway-app.railway.app/api/docs` (Swagger documentation)
+### Step 4: Check Redis Connection
+
+Verify Redis connection:
+
+1. **Upstash Redis is accessible**
+2. **Redis URL is correct**
+3. **Redis instance is running**
+
+### Step 5: Check Application Startup
+
+Look for these in the logs:
+
+```bash
+# Should see:
+[Nest] Starting Nest application...
+[InstanceLoader] AppModule dependencies initialized
+[RoutesResolver] AuthController {/api/v1/auth}:
+[RoutesResolver] UserController {/api/v1/user}:
+[RoutesResolver] ResumeController {/api/v1/resumes}:
+[RoutesResolver] JobController {/api/v1/job-history}:
+[RoutesResolver] AiController {/api/v1/ai}:
+[RoutesResolver] LatexController {/api/v1/latex}:
+[NestApplication] Nest application successfully started
+🚀 Application is running on: http://0.0.0.0:3001
+```
+
+### Step 6: Common Fixes
+
+#### Fix 1: Update CORS Origin
+```bash
+CORS_ORIGIN=https://frontend-lxbow585y-yuvrajgupta1808s-projects.vercel.app
+```
+
+#### Fix 2: Check Port Configuration
+```bash
+PORT=3001
+```
+
+#### Fix 3: Verify Database SSL
+Make sure your DATABASE_URL includes `?sslmode=require`
+
+#### Fix 4: Check File Permissions
+Ensure the application can write to the uploads directory
+
+### Step 7: Test Backend Endpoints
+
+Once running, test these endpoints:
+
+```bash
+# Health check
+GET https://your-railway-backend-url.railway.app/api/v1/auth/profile
+
+# API docs
+GET https://your-railway-backend-url.railway.app/api/docs
+```
+
+### Step 8: Railway CLI Commands
+
+If you have Railway CLI installed:
+
+```bash
+# Login to Railway
+railway login
+
+# Check project status
+railway status
+
+# View logs
+railway logs
+
+# Check environment variables
+railway variables
+```
+
+### Step 9: Redeploy
+
+If all else fails:
+
+1. Go to Railway dashboard
+2. Click "Redeploy" on your project
+3. Monitor the deployment logs
+4. Check if the 502 error persists
+
+### Step 10: Contact Support
+
+If the issue persists:
+
+1. Check Railway status page: https://status.railway.app/
+2. Contact Railway support with:
+   - Project URL
+   - Error logs
+   - Environment variables (without sensitive data)
+   - Steps you've tried
+
+## Expected Working State
+
+When everything is working, you should see:
+
+```
+✅ Backend accessible at: https://your-railway-backend-url.railway.app
+✅ API docs at: https://your-railway-backend-url.railway.app/api/docs
+✅ Health check passing
+✅ Database connected
+✅ Redis connected
+✅ All endpoints responding
+```
+
+## Next Steps After Fix
+
+1. Update frontend `NEXT_PUBLIC_API_URL` with Railway backend URL
+2. Test complete application flow
+3. Set up GitHub Actions for auto-deployment
+4. Configure OAuth providers
+5. Test all features end-to-end
