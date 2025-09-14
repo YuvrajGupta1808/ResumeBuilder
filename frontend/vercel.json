@@ -3,8 +3,12 @@
   "installCommand": "npm install",
   "framework": "nextjs",
   "env": {
-    "NEXTAUTH_URL": "https://frontend-hoj84axv5-yuvrajgupta1808s-projects.vercel.app",
-    "NEXTAUTH_SECRET": "your-nextauth-secret-here",
-    "NEXT_PUBLIC_API_URL": "https://your-railway-backend-url.railway.app"
+    "NEXTAUTH_URL": "https://frontend-jtauktf9b-yuvrajgupta1808s-projects.vercel.app",
+    "NEXTAUTH_SECRET": "resume-builder-secret-key-2024",
+    "NEXT_PUBLIC_API_URL": "https://your-railway-backend-url.railway.app",
+    "GOOGLE_CLIENT_ID": "your-google-client-id",
+    "GOOGLE_CLIENT_SECRET": "your-google-client-secret",
+    "GITHUB_CLIENT_ID": "your-github-client-id",
+    "GITHUB_CLIENT_SECRET": "your-github-client-secret"
   }
 }

@@ -1,4 +1,5 @@
 import NextAuth from 'next-auth';
+import CredentialsProvider from 'next-auth/providers/credentials';
 import GitHubProvider from 'next-auth/providers/github';
 import GoogleProvider from 'next-auth/providers/google';
 
@@ -12,6 +13,25 @@ const handler = NextAuth({
       clientId: process.env.GITHUB_CLIENT_ID || 'dummy',
       clientSecret: process.env.GITHUB_CLIENT_SECRET || 'dummy',
     }),
+    CredentialsProvider({
+      name: 'credentials',
+      credentials: {
+        email: { label: 'Email', type: 'email' },
+        password: { label: 'Password', type: 'password' }
+      },
+      async authorize(credentials) {
+        // For demo purposes, accept any email/password combination
+        // In production, you would validate against your backend API
+        if (credentials?.email && credentials?.password) {
+          return {
+            id: '1',
+            email: credentials.email,
+            name: credentials.email.split('@')[0],
+          };
+        }
+        return null;
+      }
+    })
   ],
   callbacks: {
     session: async ({ session, token }) => {
