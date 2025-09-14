@@ -1,0 +1,10 @@
+{
+  "buildCommand": "next build",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "env": {
+    "NEXTAUTH_URL": "https://frontend-hoj84axv5-yuvrajgupta1808s-projects.vercel.app",
+    "NEXTAUTH_SECRET": "your-nextauth-secret-here",
+    "NEXT_PUBLIC_API_URL": "https://your-railway-backend-url.railway.app"
+  }
+}
