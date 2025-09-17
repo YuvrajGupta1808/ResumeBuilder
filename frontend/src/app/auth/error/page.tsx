@@ -1,6 +1,17 @@
 'use client';
 
-import { Alert, AlertIcon, Box, Button, Card, CardBody, Container, Heading, Text, VStack } from '@chakra-ui/react';
+import {
+  Alert,
+  AlertIcon,
+  Box,
+  Button,
+  Card,
+  CardBody,
+  Container,
+  Heading,
+  Text,
+  VStack,
+} from '@chakra-ui/react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
@@ -22,31 +33,32 @@ export default function AuthError() {
   };
 
   return (
-    <Container maxW="md" py={12}>
+    <Container maxW='md' py={12}>
       <Card>
         <CardBody>
           <VStack spacing={6}>
-            <Box textAlign="center">
-              <Heading size="lg" mb={2} color="red.500">
+            <Box textAlign='center'>
+              <Heading size='lg' mb={2} color='red.500'>
                 Authentication Error
               </Heading>
             </Box>
 
-            <Alert status="error">
+            <Alert status='error'>
               <AlertIcon />
               {getErrorMessage(error)}
             </Alert>
 
             <VStack spacing={4}>
-              <Text textAlign="center" color="gray.600">
-                Please try signing in again or contact support if the problem persists.
+              <Text textAlign='center' color='gray.600'>
+                Please try signing in again or contact support if the problem
+                persists.
               </Text>
 
-              <Button as={Link} href="/auth/signin" colorScheme="blue">
+              <Button as={Link} href='/auth/signin' colorScheme='blue'>
                 Try Again
               </Button>
 
-              <Button as={Link} href="/" variant="outline">
+              <Button as={Link} href='/' variant='outline'>
                 Go Home
               </Button>
             </VStack>

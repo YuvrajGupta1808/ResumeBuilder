@@ -57,34 +57,39 @@ export default function SignIn() {
   };
 
   return (
-    <Container maxW="md justify-center" justifyContent="center" alignItems="center" py={12}>
+    <Container
+      maxW='md justify-center'
+      justifyContent='center'
+      alignItems='center'
+      py={12}
+    >
       <Card>
         <CardBody>
           <VStack spacing={6}>
-            <Box textAlign="center">
-              <Heading size="lg" mb={2}>
+            <Box textAlign='center'>
+              <Heading size='lg' mb={2}>
                 Sign In
               </Heading>
-              <Text color="gray.600">
+              <Text color='gray.600'>
                 Enter your credentials to access your account
               </Text>
             </Box>
 
             {error && (
-              <Alert status="error">
+              <Alert status='error'>
                 <AlertIcon />
                 {error}
               </Alert>
             )}
 
             {/* OAuth Providers */}
-            <VStack spacing={3} w="full">
+            <VStack spacing={3} w='full'>
               <Button
                 onClick={() => signIn('google', { callbackUrl: '/' })}
-                colorScheme="red"
-                variant="outline"
-                size="lg"
-                w="full"
+                colorScheme='red'
+                variant='outline'
+                size='lg'
+                w='full'
                 leftIcon={<Text>🔍</Text>}
               >
                 Continue with Google
@@ -92,62 +97,62 @@ export default function SignIn() {
 
               <Button
                 onClick={() => signIn('github', { callbackUrl: '/' })}
-                colorScheme="gray"
-                variant="outline"
-                size="lg"
-                w="full"
+                colorScheme='gray'
+                variant='outline'
+                size='lg'
+                w='full'
                 leftIcon={<Text>🐙</Text>}
               >
                 Continue with GitHub
               </Button>
             </VStack>
 
-            <HStack w="full">
+            <HStack w='full'>
               <Divider />
-              <Text fontSize="sm" color="gray.500">
+              <Text fontSize='sm' color='gray.500'>
                 OR
               </Text>
               <Divider />
             </HStack>
 
             {/* Email/Password Form */}
-            <Box as="form" onSubmit={handleSubmit} w="full">
+            <Box as='form' onSubmit={handleSubmit} w='full'>
               <VStack spacing={4}>
                 <FormControl isRequired>
                   <FormLabel>Email</FormLabel>
                   <Input
-                    type="email"
+                    type='email'
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email"
+                    onChange={e => setEmail(e.target.value)}
+                    placeholder='Enter your email'
                   />
                 </FormControl>
 
                 <FormControl isRequired>
                   <FormLabel>Password</FormLabel>
                   <Input
-                    type="password"
+                    type='password'
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your password"
+                    onChange={e => setPassword(e.target.value)}
+                    placeholder='Enter your password'
                   />
                 </FormControl>
 
                 <Button
-                  type="submit"
-                  colorScheme="blue"
-                  size="lg"
-                  w="full"
+                  type='submit'
+                  colorScheme='blue'
+                  size='lg'
+                  w='full'
                   isLoading={isLoading}
-                  loadingText="Signing in..."
+                  loadingText='Signing in...'
                 >
                   Sign In with Email
                 </Button>
               </VStack>
             </Box>
 
-            <Box textAlign="center">
-              <Text fontSize="sm" color="gray.600">
+            <Box textAlign='center'>
+              <Text fontSize='sm' color='gray.600'>
                 Demo: Use any email and password to sign in
               </Text>
             </Box>

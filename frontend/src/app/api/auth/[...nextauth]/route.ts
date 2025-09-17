@@ -17,7 +17,7 @@ const handler = NextAuth({
       name: 'credentials',
       credentials: {
         email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' }
+        password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
         // For demo purposes, accept any email/password combination
@@ -30,8 +30,8 @@ const handler = NextAuth({
           };
         }
         return null;
-      }
-    })
+      },
+    }),
   ],
   callbacks: {
     session: async ({ session, token }) => {

@@ -1,6 +1,7 @@
 'use client';
 
 import { useApiClient } from '@/lib/api-client';
+import { useCallback } from 'react';
 import {
   Box,
   SimpleGrid,
@@ -35,7 +36,7 @@ export function StatsCards() {
     fetchStats();
   }, [apiClient]);
 
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     try {
       const response = await apiClient.get('/user/stats');
       setStats(response.data);
@@ -44,7 +45,7 @@ export function StatsCards() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [apiClient]);
 
   if (loading) {
     return (

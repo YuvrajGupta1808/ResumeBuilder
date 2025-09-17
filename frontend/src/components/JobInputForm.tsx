@@ -2,19 +2,20 @@
 
 import { useApiClient } from '@/lib/api-client';
 import { Resume } from '@/types';
+import { useCallback } from 'react';
 import {
-    Box,
-    Button,
-    FormControl,
-    FormErrorMessage,
-    FormLabel,
-    HStack,
-    Input,
-    Select,
-    Text,
-    Textarea,
-    useToast,
-    VStack,
+  Box,
+  Button,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  HStack,
+  Input,
+  Select,
+  Text,
+  Textarea,
+  useToast,
+  VStack,
 } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
@@ -49,9 +50,9 @@ export function JobInputForm() {
 
   useEffect(() => {
     fetchResumes();
-  }, [apiClient]);
+  }, [apiClient, fetchResumes]);
 
-  const fetchResumes = async () => {
+  const fetchResumes = useCallback(async () => {
     try {
       const response = await apiClient.get('/resumes');
       setResumes(response.data);
@@ -64,15 +65,16 @@ export function JobInputForm() {
         isClosable: true,
       });
     }
-  };
+  }, [apiClient, toast]);
 
   const onSubmit = async (data: JobInputFormData) => {
     setIsProcessing(true);
-    
+
     // Show initial processing toast
     toast({
       title: 'AI Processing Started',
-      description: 'Our AI is analyzing the job description and tailoring your resume. This may take 30-60 seconds...',
+      description:
+        'Our AI is analyzing the job description and tailoring your resume. This may take 30-60 seconds...',
       status: 'info',
       duration: 10000,
       isClosable: true,
@@ -101,23 +103,26 @@ export function JobInputForm() {
       window.location.href = `/download?jobHistoryId=${response.data.jobHistoryId}`;
     } catch (error: any) {
       console.error('AI tailoring error:', error);
-      
+
       let errorMessage = 'Please try again later.';
       let errorTitle = 'Error processing request';
-      
+
       if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
         errorTitle = 'Request Timeout';
-        errorMessage = 'The AI processing is taking longer than expected. Please try again or check back in a few minutes.';
+        errorMessage =
+          'The AI processing is taking longer than expected. Please try again or check back in a few minutes.';
       } else if (error.response?.status === 500) {
         errorTitle = 'Server Error';
-        errorMessage = 'There was a server error. Please try again in a few minutes.';
+        errorMessage =
+          'There was a server error. Please try again in a few minutes.';
       } else if (error.response?.status === 429) {
         errorTitle = 'Rate Limited';
-        errorMessage = 'Too many requests. Please wait a moment before trying again.';
+        errorMessage =
+          'Too many requests. Please wait a moment before trying again.';
       } else if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
       }
-      
+
       toast({
         title: errorTitle,
         description: errorMessage,
@@ -387,8 +392,12 @@ Responsibilities:
               transition: 'all 0.3s ease',
               '&:hover': {
                 transform: isProcessing ? 'none' : 'translateY(-2px)',
-                boxShadow: isProcessing ? 'none' : '0 12px 32px rgba(147, 51, 234, 0.3)',
-                bg: isProcessing ? 'linear-gradient(135deg, #9333ea 0%, #7c3aed 100%)' : 'linear-gradient(135deg, #8b2bd9 0%, #6d28d9 100%)',
+                boxShadow: isProcessing
+                  ? 'none'
+                  : '0 12px 32px rgba(147, 51, 234, 0.3)',
+                bg: isProcessing
+                  ? 'linear-gradient(135deg, #9333ea 0%, #7c3aed 100%)'
+                  : 'linear-gradient(135deg, #8b2bd9 0%, #6d28d9 100%)',
               },
               '&:active': {
                 transform: 'translateY(0px)',
@@ -396,7 +405,9 @@ Responsibilities:
             }}
             leftIcon={!isProcessing ? <FiZap size={20} /> : undefined}
           >
-            {isProcessing ? 'AI Processing...' : 'Tailor Resume & Generate Cover Letter'}
+            {isProcessing
+              ? 'AI Processing...'
+              : 'Tailor Resume & Generate Cover Letter'}
           </Button>
         </VStack>
       </form>

@@ -2,6 +2,7 @@
 
 import { useApiClient } from '@/lib/api-client';
 import { Resume } from '@/types';
+import { useCallback } from 'react';
 import { Box, Button, Heading, HStack, Text, VStack } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { FiCalendar, FiEye, FiFileText } from 'react-icons/fi';
@@ -15,9 +16,9 @@ export function RecentResumes() {
 
   useEffect(() => {
     fetchResumes();
-  }, [apiClient]);
+  }, [fetchResumes]);
 
-  const fetchResumes = async () => {
+  const fetchResumes = useCallback(async () => {
     try {
       const response = await apiClient.get('/resumes');
       setResumes(response.data.slice(0, 5)); // Show only recent 5
@@ -26,7 +27,7 @@ export function RecentResumes() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [apiClient]);
 
   const viewResume = (resume: Resume) => {
     // Create a new window/tab to view the resume content

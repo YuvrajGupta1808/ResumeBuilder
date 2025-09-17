@@ -199,8 +199,8 @@ export function Navbar() {
               >
                 <Avatar
                   size={'xs'}
-                  w="40px"
-                  h="40px"
+                  w='40px'
+                  h='40px'
                   src={session.user?.image || ''}
                   border='1px solid'
                   borderColor='brand.200'

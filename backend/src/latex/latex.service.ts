@@ -168,7 +168,11 @@ Sincerely,
       const line = lines[i].trim();
       if (line.includes('@') && !parsedData.email) {
         parsedData.email = line;
-      } else if (line.includes('(') && line.includes(')') && !parsedData.phone) {
+      } else if (
+        line.includes('(') &&
+        line.includes(')') &&
+        !parsedData.phone
+      ) {
         parsedData.phone = line;
       } else if (line.includes('linkedin.com') && !parsedData.linkedin) {
         const match = line.match(/linkedin\.com\/in\/([^\\s]+)/);
@@ -176,10 +180,20 @@ Sincerely,
       } else if (line.includes('github.com') && !parsedData.github) {
         const match = line.match(/github\.com\/([^\\s]+)/);
         if (match) parsedData.github = match[1];
-      } else if ((line.includes('www.') || line.includes('http')) && !parsedData.website) {
+      } else if (
+        (line.includes('www.') || line.includes('http')) &&
+        !parsedData.website
+      ) {
         const match = line.match(/www\.([^\\s]+)/);
         if (match) parsedData.website = match[1];
-      } else if (line && !line.includes('•') && !line.includes('-') && !line.includes('|') && !parsedData.location && line.length > 3) {
+      } else if (
+        line &&
+        !line.includes('•') &&
+        !line.includes('-') &&
+        !line.includes('|') &&
+        !parsedData.location &&
+        line.length > 3
+      ) {
         parsedData.location = line;
       }
     }
@@ -215,36 +229,75 @@ Sincerely,
       if (upperLine.includes('EDUCATION') || upperLine.includes('ACADEMIC')) {
         currentSection = 'education';
         sectionContents[currentSection] = '';
-      } else if (upperLine.includes('SKILLS') || upperLine.includes('TECHNICAL') || upperLine.includes('PROGRAMMING') || upperLine.includes('LANGUAGES')) {
+      } else if (
+        upperLine.includes('SKILLS') ||
+        upperLine.includes('TECHNICAL') ||
+        upperLine.includes('PROGRAMMING') ||
+        upperLine.includes('LANGUAGES')
+      ) {
         currentSection = 'skills';
         sectionContents[currentSection] = '';
-      } else if (upperLine.includes('EXPERIENCE') || upperLine.includes('WORK') || upperLine.includes('EMPLOYMENT') || upperLine.includes('PROFESSIONAL')) {
+      } else if (
+        upperLine.includes('EXPERIENCE') ||
+        upperLine.includes('WORK') ||
+        upperLine.includes('EMPLOYMENT') ||
+        upperLine.includes('PROFESSIONAL')
+      ) {
         currentSection = 'experience';
         sectionContents[currentSection] = '';
-      } else if (upperLine.includes('PROJECTS') || upperLine.includes('PORTFOLIO')) {
+      } else if (
+        upperLine.includes('PROJECTS') ||
+        upperLine.includes('PORTFOLIO')
+      ) {
         currentSection = 'projects';
         sectionContents[currentSection] = '';
-      } else if (upperLine.includes('SUMMARY') || upperLine.includes('OBJECTIVE') || upperLine.includes('PROFILE')) {
+      } else if (
+        upperLine.includes('SUMMARY') ||
+        upperLine.includes('OBJECTIVE') ||
+        upperLine.includes('PROFILE')
+      ) {
         currentSection = 'summary';
         sectionContents[currentSection] = '';
-      } else if (upperLine.includes('CERTIFICATIONS') || upperLine.includes('CERTIFICATES')) {
+      } else if (
+        upperLine.includes('CERTIFICATIONS') ||
+        upperLine.includes('CERTIFICATES')
+      ) {
         currentSection = 'certifications';
         sectionContents[currentSection] = '';
-      } else if (upperLine.includes('AWARDS') || upperLine.includes('ACHIEVEMENTS')) {
+      } else if (
+        upperLine.includes('AWARDS') ||
+        upperLine.includes('ACHIEVEMENTS')
+      ) {
         currentSection = 'awards';
         sectionContents[currentSection] = '';
-      } else if (upperLine.includes('VOLUNTEER') || upperLine.includes('ACTIVITIES')) {
+      } else if (
+        upperLine.includes('VOLUNTEER') ||
+        upperLine.includes('ACTIVITIES')
+      ) {
         currentSection = 'volunteer';
         sectionContents[currentSection] = '';
-      } else if (trimmedLine && currentSection && !upperLine.includes('SECTION') && !upperLine.includes('HEADER')) {
+      } else if (
+        trimmedLine &&
+        currentSection &&
+        !upperLine.includes('SECTION') &&
+        !upperLine.includes('HEADER')
+      ) {
         sectionContents[currentSection] += trimmedLine + '\\n';
       }
     }
 
     // Format the content for LaTeX using the new formatting methods
     parsedData.education = this.formatEducationNew(sectionContents.education);
-    parsedData.skills = this.formatSkillsNew(sectionContents.skills || sectionContents.technical || sectionContents.programming);
-    parsedData.experience = this.formatExperienceNew(sectionContents.experience || sectionContents.work || sectionContents.employment);
+    parsedData.skills = this.formatSkillsNew(
+      sectionContents.skills ||
+        sectionContents.technical ||
+        sectionContents.programming
+    );
+    parsedData.experience = this.formatExperienceNew(
+      sectionContents.experience ||
+        sectionContents.work ||
+        sectionContents.employment
+    );
     parsedData.projects = this.formatProjectsNew(sectionContents.projects);
 
     // Ensure content fits on one page by limiting items
@@ -257,7 +310,8 @@ Sincerely,
     // Limit skills to 5 items maximum (more aggressive)
     if (parsedData.skills) {
       const skillLines = parsedData.skills.split('\\item');
-      if (skillLines.length > 6) { // 5 items + 1 empty first element
+      if (skillLines.length > 6) {
+        // 5 items + 1 empty first element
         parsedData.skills = skillLines.slice(0, 6).join('\\item');
       }
     }
@@ -265,7 +319,8 @@ Sincerely,
     // Limit experience to 2 entries maximum (more aggressive)
     if (parsedData.experience) {
       const expSections = parsedData.experience.split('\\textbf{');
-      if (expSections.length > 3) { // 2 entries + 1 empty first element
+      if (expSections.length > 3) {
+        // 2 entries + 1 empty first element
         parsedData.experience = expSections.slice(0, 3).join('\\textbf{');
       }
     }
@@ -273,12 +328,15 @@ Sincerely,
     // Limit projects to 3 entries maximum and remove duplicates
     if (parsedData.projects) {
       const projSections = parsedData.projects.split('\\textbf{');
-      if (projSections.length > 4) { // 3 entries + 1 empty first element
+      if (projSections.length > 4) {
+        // 3 entries + 1 empty first element
         parsedData.projects = projSections.slice(0, 4).join('\\textbf{');
       }
 
       // Remove duplicate project content
-      parsedData.projects = this.removeDuplicateProjectContent(parsedData.projects);
+      parsedData.projects = this.removeDuplicateProjectContent(
+        parsedData.projects
+      );
     }
 
     return parsedData;
@@ -291,7 +349,8 @@ Sincerely,
     const uniqueProjects: string[] = [];
     const seenDescriptions = new Set<string>();
 
-    for (let i = 1; i < sections.length; i++) { // Skip first empty element
+    for (let i = 1; i < sections.length; i++) {
+      // Skip first empty element
       const section = sections[i];
       if (!section.trim()) continue;
 
@@ -424,7 +483,12 @@ Sincerely,
     for (const line of lines) {
       if (line.trim()) {
         // Check if this line contains a university/school name (usually contains "University", "College", "Institute", etc.)
-        if (line.includes('University') || line.includes('College') || line.includes('Institute') || line.includes('School')) {
+        if (
+          line.includes('University') ||
+          line.includes('College') ||
+          line.includes('Institute') ||
+          line.includes('School')
+        ) {
           // If we have a previous entry, format it first
           if (currentEntry) {
             formatted += this.formatEducationEntry(currentEntry);
@@ -489,14 +553,26 @@ Sincerely,
         } else {
           formatted += `\\item ${skill} \\\\[-0.1cm]`;
         }
-      } else if (trimmedLine.includes(':') && (trimmedLine.includes('Languages') || trimmedLine.includes('Technologies') || trimmedLine.includes('Tools') || trimmedLine.includes('Frameworks') || trimmedLine.includes('Software') || trimmedLine.includes('Systems'))) {
+      } else if (
+        trimmedLine.includes(':') &&
+        (trimmedLine.includes('Languages') ||
+          trimmedLine.includes('Technologies') ||
+          trimmedLine.includes('Tools') ||
+          trimmedLine.includes('Frameworks') ||
+          trimmedLine.includes('Software') ||
+          trimmedLine.includes('Systems'))
+      ) {
         // This is a category header
         if (currentCategory && skillsInCategory.length > 0) {
           formatted += `\\item \\textbf{${currentCategory}:} ${skillsInCategory.join(', ')} \\\\[-0.1cm]`;
         }
         currentCategory = trimmedLine.replace(':', '').trim();
         skillsInCategory = [];
-      } else if (trimmedLine && !trimmedLine.includes('SECTION') && !trimmedLine.includes('HEADER')) {
+      } else if (
+        trimmedLine &&
+        !trimmedLine.includes('SECTION') &&
+        !trimmedLine.includes('HEADER')
+      ) {
         // This might be a skill or category
         if (currentCategory) {
           skillsInCategory.push(trimmedLine);
@@ -531,10 +607,20 @@ Sincerely,
     for (const line of lines) {
       const trimmedLine = line.trim();
 
-      if (trimmedLine.includes('|') && !trimmedLine.includes('•') && !trimmedLine.includes('-')) {
+      if (
+        trimmedLine.includes('|') &&
+        !trimmedLine.includes('•') &&
+        !trimmedLine.includes('-')
+      ) {
         // This is a job title line with pipe separators
         if (currentJob && currentCompany) {
-          formatted += this.formatExperienceEntry(currentCompany, currentJob, currentDates, currentLocation, bulletPoints);
+          formatted += this.formatExperienceEntry(
+            currentCompany,
+            currentJob,
+            currentDates,
+            currentLocation,
+            bulletPoints
+          );
         }
 
         const parts = trimmedLine.split('|');
@@ -549,17 +635,33 @@ Sincerely,
         const bullet = trimmedLine.replace(/[•-]/, '').trim();
         bulletPoints.push(bullet);
         isNewJob = false;
-      } else if (trimmedLine && !trimmedLine.includes('SECTION') && !trimmedLine.includes('HEADER')) {
+      } else if (
+        trimmedLine &&
+        !trimmedLine.includes('SECTION') &&
+        !trimmedLine.includes('HEADER')
+      ) {
         // This might be a company name, job title, or date
         if (isNewJob || (!currentJob && !currentCompany)) {
           // Try to detect if this is a company name (usually contains Inc, Corp, LLC, etc.)
-          if (trimmedLine.includes('Inc') || trimmedLine.includes('Corp') || trimmedLine.includes('LLC') || trimmedLine.includes('Ltd') || trimmedLine.includes('Company') || trimmedLine.includes('University') || trimmedLine.includes('College')) {
+          if (
+            trimmedLine.includes('Inc') ||
+            trimmedLine.includes('Corp') ||
+            trimmedLine.includes('LLC') ||
+            trimmedLine.includes('Ltd') ||
+            trimmedLine.includes('Company') ||
+            trimmedLine.includes('University') ||
+            trimmedLine.includes('College')
+          ) {
             if (!currentCompany) {
               currentCompany = trimmedLine;
             } else if (!currentJob) {
               currentJob = trimmedLine;
             }
-          } else if (trimmedLine.match(/\\d{4}/) || trimmedLine.includes('Present') || trimmedLine.includes('Current')) {
+          } else if (
+            trimmedLine.match(/\\d{4}/) ||
+            trimmedLine.includes('Present') ||
+            trimmedLine.includes('Current')
+          ) {
             // This looks like a date
             currentDates = trimmedLine;
           } else if (!currentJob) {
@@ -573,13 +675,25 @@ Sincerely,
 
     // Format the last job entry
     if (currentJob && currentCompany) {
-      formatted += this.formatExperienceEntry(currentCompany, currentJob, currentDates, currentLocation, bulletPoints);
+      formatted += this.formatExperienceEntry(
+        currentCompany,
+        currentJob,
+        currentDates,
+        currentLocation,
+        bulletPoints
+      );
     }
 
     return formatted;
   }
 
-  private formatExperienceEntry(company: string, job: string, dates: string, location: string, bullets: string[]): string {
+  private formatExperienceEntry(
+    company: string,
+    job: string,
+    dates: string,
+    location: string,
+    bullets: string[]
+  ): string {
     let formatted = `\\textbf{${company}}`;
     if (location) {
       formatted += ` \\hfill ${location}`;
@@ -619,10 +733,18 @@ Sincerely,
     for (const line of lines) {
       const trimmedLine = line.trim();
 
-      if (trimmedLine.includes('|') && !trimmedLine.includes('•') && !trimmedLine.includes('-')) {
+      if (
+        trimmedLine.includes('|') &&
+        !trimmedLine.includes('•') &&
+        !trimmedLine.includes('-')
+      ) {
         // This is a project title line with pipe separators
         if (currentProject) {
-          formatted += this.formatProjectEntry(currentProject, currentDates, bulletPoints);
+          formatted += this.formatProjectEntry(
+            currentProject,
+            currentDates,
+            bulletPoints
+          );
         }
 
         const parts = trimmedLine.split('|');
@@ -635,16 +757,27 @@ Sincerely,
         const bullet = trimmedLine.replace(/[•-]/, '').trim();
         bulletPoints.push(bullet);
         isNewProject = false;
-      } else if (trimmedLine && !trimmedLine.includes('SECTION') && !trimmedLine.includes('HEADER')) {
+      } else if (
+        trimmedLine &&
+        !trimmedLine.includes('SECTION') &&
+        !trimmedLine.includes('HEADER')
+      ) {
         // This might be a project name or date
         if (isNewProject || !currentProject) {
-          if (trimmedLine.match(/\\d{4}/) || trimmedLine.includes('Present') || trimmedLine.includes('Current')) {
+          if (
+            trimmedLine.match(/\\d{4}/) ||
+            trimmedLine.includes('Present') ||
+            trimmedLine.includes('Current')
+          ) {
             // This looks like a date - ensure it's in the past for projects
             let dateStr = trimmedLine;
             if (dateStr.includes('Present') || dateStr.includes('Current')) {
               // Convert "Present" or "Current" to a past date for projects
               const currentYear = new Date().getFullYear();
-              dateStr = dateStr.replace(/Present|Current/g, `${currentYear - 1}`);
+              dateStr = dateStr.replace(
+                /Present|Current/g,
+                `${currentYear - 1}`
+              );
             } else {
               // Check if the date is in the future and convert to past
               const yearMatch = dateStr.match(/(\\d{4})/);
@@ -653,7 +786,10 @@ Sincerely,
                 const currentYear = new Date().getFullYear();
                 if (year > currentYear) {
                   // Convert future year to past year
-                  dateStr = dateStr.replace(year.toString(), (currentYear - 1).toString());
+                  dateStr = dateStr.replace(
+                    year.toString(),
+                    (currentYear - 1).toString()
+                  );
                 }
               }
             }
@@ -667,13 +803,21 @@ Sincerely,
 
     // Format the last project entry
     if (currentProject) {
-      formatted += this.formatProjectEntry(currentProject, currentDates, bulletPoints);
+      formatted += this.formatProjectEntry(
+        currentProject,
+        currentDates,
+        bulletPoints
+      );
     }
 
     return formatted;
   }
 
-  private formatProjectEntry(project: string, dates: string, bullets: string[]): string {
+  private formatProjectEntry(
+    project: string,
+    dates: string,
+    bullets: string[]
+  ): string {
     let formatted = `\\textbf{${project}}`;
     if (dates) {
       formatted += ` \\hfill ${dates}`;

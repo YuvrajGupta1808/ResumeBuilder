@@ -3,14 +3,14 @@
 import { api } from '@/lib/api';
 import { JobHistory } from '@/types';
 import {
-    Box,
-    Button,
-    Divider,
-    Heading,
-    HStack,
-    Text,
-    useToast,
-    VStack,
+  Box,
+  Button,
+  Divider,
+  Heading,
+  HStack,
+  Text,
+  useToast,
+  VStack,
 } from '@chakra-ui/react';
 import jsPDF from 'jspdf';
 import { useSearchParams } from 'next/navigation';
@@ -39,24 +39,25 @@ export function TailoredResume() {
       setJobHistory(response.data);
     } catch (error: any) {
       console.error('Error fetching job history:', error);
-      
+
       // If the job history is not found, it might still be processing
       if (error.response?.status === 404) {
         toast({
           title: 'Resume Still Processing',
-          description: 'Your tailored resume is still being generated. Please wait a moment and refresh the page.',
+          description:
+            'Your tailored resume is still being generated. Please wait a moment and refresh the page.',
           status: 'info',
           duration: 5000,
           isClosable: true,
         });
-        
+
         // Retry after 5 seconds
         setTimeout(() => {
           fetchJobHistory();
         }, 5000);
         return;
       }
-      
+
       toast({
         title: 'Error Loading Resume',
         description: 'Failed to load the tailored resume. Please try again.',
@@ -162,10 +163,10 @@ export function TailoredResume() {
         p={6}
       >
         <VStack spacing={4}>
-          <Text fontSize="lg" fontWeight="600" color="gray.700">
+          <Text fontSize='lg' fontWeight='600' color='gray.700'>
             Loading tailored resume...
           </Text>
-          <Text fontSize="sm" color="gray.500" textAlign="center">
+          <Text fontSize='sm' color='gray.500' textAlign='center'>
             This may take a few moments while we process your request.
           </Text>
         </VStack>

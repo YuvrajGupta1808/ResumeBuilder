@@ -19,7 +19,10 @@ const getApiBaseUrl = (): string => {
   }
 
   if (isProduction) {
-    return process.env.NEXT_PUBLIC_API_URL || 'https://resumebuilder-production-8b20.up.railway.app';
+    return (
+      process.env.NEXT_PUBLIC_API_URL ||
+      'https://resumebuilder-production-8b20.up.railway.app'
+    );
   }
 
   // Fallback

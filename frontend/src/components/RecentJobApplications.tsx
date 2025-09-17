@@ -2,6 +2,7 @@
 
 import { useApiClient } from '@/lib/api-client';
 import { JobHistory } from '@/types';
+import { useCallback } from 'react';
 import { Box, Button, Heading, HStack, Text, VStack } from '@chakra-ui/react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -16,9 +17,9 @@ export function RecentJobApplications() {
 
   useEffect(() => {
     fetchJobApplications();
-  }, [apiClient]);
+  }, [fetchJobApplications]);
 
-  const fetchJobApplications = async () => {
+  const fetchJobApplications = useCallback(async () => {
     try {
       const response = await apiClient.get('/job-history');
       setJobApplications(response.data.slice(0, 5)); // Show only recent 5
@@ -27,7 +28,7 @@ export function RecentJobApplications() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [apiClient]);
 
   if (loading) {
     return (
