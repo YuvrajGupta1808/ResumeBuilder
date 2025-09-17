@@ -241,27 +241,14 @@ npm run prisma:studio
 
 ## 🚀 Deployment
 
-### Frontend (Vercel)
+### Railway Deployment (Recommended)
 
-1. **Connect Repository**
-   - Import project to Vercel
-   - Set root directory to `frontend`
+This application is configured for easy deployment on Railway. See the comprehensive deployment guides:
 
-2. **Environment Variables**
-   ```env
-   NEXTAUTH_URL=https://your-domain.vercel.app
-   NEXTAUTH_SECRET=your-production-secret
-   GOOGLE_CLIENT_ID=your-google-client-id
-   GOOGLE_CLIENT_SECRET=your-google-client-secret
-   GITHUB_CLIENT_ID=your-github-client-id
-   GITHUB_CLIENT_SECRET=your-github-client-secret
-   NEXT_PUBLIC_API_URL=https://your-api-domain.com
-   ```
+- **Quick Setup**: [QUICK_RAILWAY_SETUP.md](./QUICK_RAILWAY_SETUP.md) - Deploy in 5 minutes
+- **Full Guide**: [RAILWAY_DEPLOYMENT.md](./RAILWAY_DEPLOYMENT.md) - Complete deployment instructions
 
-3. **Deploy**
-   - Vercel will automatically deploy on push to main branch
-
-### Backend (Azure App Service)
+### Alternative: Azure App Service
 
 1. **Prepare for Deployment**
    ```bash

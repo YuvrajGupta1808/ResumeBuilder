@@ -4,44 +4,55 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+    try {
+        const app = await NestFactory.create(AppModule);
 
-  // Enable CORS
-  app.enableCors({
-    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
-    credentials: true,
-  });
+        // Enable CORS
+        const corsOrigins = process.env.CORS_ORIGIN
+            ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
+            : ['http://localhost:3000'];
 
-  // Global validation pipe
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-    })
-  );
+        app.enableCors({
+            origin: corsOrigins,
+            credentials: true,
+            methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+            allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
+        });
 
-  // Swagger documentation
-  const config = new DocumentBuilder()
-    .setTitle('Resume Builder API')
-    .setDescription(
-      'API for AI-powered resume building and job application assistance'
-    )
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build();
+        // Global validation pipe
+        app.useGlobalPipes(
+            new ValidationPipe({
+                whitelist: true,
+                forbidNonWhitelisted: true,
+                transform: true,
+            })
+        );
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document);
+        // Swagger documentation
+        const config = new DocumentBuilder()
+            .setTitle('Resume Builder API')
+            .setDescription(
+                'API for AI-powered resume building and job application assistance'
+            )
+            .setVersion('1.0')
+            .addBearerAuth()
+            .build();
 
-  // Global prefix
-  app.setGlobalPrefix('api/v1');
+        const document = SwaggerModule.createDocument(app, config);
+        SwaggerModule.setup('api/docs', app, document);
 
-  const port = process.env.PORT || 3001;
-  await app.listen(port);
+        // Global prefix
+        app.setGlobalPrefix('api/v1');
 
-  console.log(`🚀 Application is running on: http://localhost:${port}`);
-  console.log(`📚 Swagger documentation: http://localhost:${port}/api/docs`);
+        const port = process.env.PORT || 3001;
+        await app.listen(port, '0.0.0.0');
+
+        console.log(`🚀 Application is running on: http://0.0.0.0:${port}`);
+        console.log(`📚 Swagger documentation: http://0.0.0.0:${port}/api/docs`);
+    } catch (error) {
+        console.error('❌ Failed to start application:', error);
+        process.exit(1);
+    }
 }
 
 bootstrap();

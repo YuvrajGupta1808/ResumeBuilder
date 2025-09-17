@@ -1,21 +1,21 @@
 'use client';
 
 import {
-    Alert,
-    AlertIcon,
-    Box,
-    Button,
-    Card,
-    CardBody,
-    Container,
-    Divider,
-    FormControl,
-    FormLabel,
-    Heading,
-    HStack,
-    Input,
-    Text,
-    VStack,
+  Alert,
+  AlertIcon,
+  Box,
+  Button,
+  Card,
+  CardBody,
+  Container,
+  Divider,
+  FormControl,
+  FormLabel,
+  Heading,
+  HStack,
+  Input,
+  Text,
+  VStack,
 } from '@chakra-ui/react';
 import { getSession, signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
@@ -46,7 +46,7 @@ export default function SignIn() {
         // Check if we have a session
         const session = await getSession();
         if (session) {
-          router.push('/dashboard');
+          router.push('/');
         }
       }
     } catch (err) {
@@ -57,7 +57,7 @@ export default function SignIn() {
   };
 
   return (
-    <Container maxW="md" py={12}>
+    <Container maxW="md justify-center" justifyContent="center" alignItems="center" py={12}>
       <Card>
         <CardBody>
           <VStack spacing={6}>
@@ -80,7 +80,7 @@ export default function SignIn() {
             {/* OAuth Providers */}
             <VStack spacing={3} w="full">
               <Button
-                onClick={() => signIn('google')}
+                onClick={() => signIn('google', { callbackUrl: '/' })}
                 colorScheme="red"
                 variant="outline"
                 size="lg"
@@ -91,7 +91,7 @@ export default function SignIn() {
               </Button>
 
               <Button
-                onClick={() => signIn('github')}
+                onClick={() => signIn('github', { callbackUrl: '/' })}
                 colorScheme="gray"
                 variant="outline"
                 size="lg"

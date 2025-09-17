@@ -8,7 +8,6 @@
         "dev:frontend": "cd frontend && npm run dev",
         "build": "cd frontend && npm run build",
         "start": "cd frontend && npm start",
-        "deploy:frontend": "cd frontend && npx vercel --prod",
         "lint": "npm run lint:frontend && npm run lint:backend",
         "lint:frontend": "cd frontend && npm run lint",
         "lint:backend": "cd backend && npm run lint",

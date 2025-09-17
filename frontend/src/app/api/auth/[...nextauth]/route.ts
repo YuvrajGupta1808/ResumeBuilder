@@ -46,6 +46,21 @@ const handler = NextAuth({
       }
       return token;
     },
+    redirect: async ({ url, baseUrl }) => {
+      // Redirect to home page after successful sign-in
+      if (url === baseUrl || url === `${baseUrl}/`) {
+        return baseUrl;
+      }
+      // Allow relative URLs
+      if (url.startsWith('/')) {
+        return `${baseUrl}${url}`;
+      }
+      // Allow same origin URLs
+      if (new URL(url).origin === baseUrl) {
+        return url;
+      }
+      return baseUrl;
+    },
   },
   session: {
     strategy: 'jwt',

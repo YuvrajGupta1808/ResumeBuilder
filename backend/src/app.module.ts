@@ -4,6 +4,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { AiModule } from './ai/ai.module';
 import { AuthModule } from './auth/auth.module';
 import { CacheModule } from './cache/cache.module';
+import { HealthModule } from './health/health.module';
 import { JobModule } from './job/job.module';
 import { LatexModule } from './latex/latex.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -30,6 +31,7 @@ import { UserModule } from './user/user.module';
     AiModule,
     CacheModule,
     LatexModule,
+    HealthModule,
   ],
 })
-export class AppModule {}
+export class AppModule { }

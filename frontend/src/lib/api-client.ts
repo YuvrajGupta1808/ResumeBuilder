@@ -19,7 +19,7 @@ const getApiBaseUrl = (): string => {
   }
 
   if (isProduction) {
-    return 'https://resume-builder-backend.happyground-25b79e78.eastus.azurecontainerapps.io';
+    return process.env.NEXT_PUBLIC_API_URL || 'https://resumebuilder-production-8b20.up.railway.app';
   }
 
   // Fallback
@@ -108,7 +108,7 @@ export function useApiClient() {
       headers: {
         'Content-Type': 'application/json',
       },
-      timeout: 30000, // 30 second timeout
+      timeout: 60000, // 60 second default timeout (can be overridden per request)
     });
 
     // Request interceptor to add auth token

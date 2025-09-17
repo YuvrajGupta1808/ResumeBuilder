@@ -12,23 +12,22 @@ if [ ! -f "package.json" ]; then
     exit 1
 fi
 
-# Function to deploy frontend to Vercel
+# Function to deploy frontend to Railway
 deploy_frontend() {
-    echo "📦 Deploying Frontend to Vercel..."
+    echo "📦 Deploying Frontend to Railway..."
     cd frontend
     
-    # Check if Vercel CLI is installed
-    if ! command -v vercel &> /dev/null; then
-        echo "📥 Installing Vercel CLI..."
-        npm install -g vercel
+    # Check if Railway CLI is installed
+    if ! command -v railway &> /dev/null; then
+        echo "📥 Installing Railway CLI..."
+        npm install -g @railway/cli
     fi
     
-    # Deploy to Vercel
-    echo "🚀 Deploying to Vercel..."
-    vercel --prod
+    # Deploy to Railway
+    echo "🚀 Deploying to Railway..."
+    railway up --service frontend
     
     echo "✅ Frontend deployment completed!"
-    echo "📝 Note: Copy the Organization ID and Project ID for GitHub secrets"
     cd ..
 }
 
@@ -59,9 +58,6 @@ show_secrets_setup() {
     echo "Go to: GitHub Repository → Settings → Secrets and variables → Actions"
     echo ""
     echo "Add these secrets:"
-    echo "- VERCEL_TOKEN: Get from https://vercel.com/account/tokens"
-    echo "- VERCEL_ORG_ID: From Vercel deployment output"
-    echo "- VERCEL_PROJECT_ID: From Vercel deployment output"
     echo "- RAILWAY_TOKEN: Get from Railway dashboard → Account Settings → Tokens"
     echo ""
     echo "After adding secrets, push to main to trigger GitHub Actions deployment"
@@ -70,7 +66,7 @@ show_secrets_setup() {
 # Main menu
 echo ""
 echo "Choose deployment option:"
-echo "1) Deploy Frontend to Vercel"
+echo "1) Deploy Frontend to Railway"
 echo "2) Deploy Backend to Railway"
 echo "3) Deploy Both (Frontend + Backend)"
 echo "4) Show GitHub Secrets Setup Guide"

@@ -198,16 +198,18 @@ export function Navbar() {
                 transition='all 0.2s ease'
               >
                 <Avatar
-                  size={'28px'}
+                  size={'xs'}
+                  w="40px"
+                  h="40px"
                   src={session.user?.image || ''}
-                  border='2px solid'
+                  border='1px solid'
                   borderColor='brand.200'
-                  boxShadow='0 2px 8px rgba(0, 136, 255, 0.15)'
+                  boxShadow='0 1px 4px rgba(0, 136, 255, 0.15)'
                   sx={{
                     transition: 'all 0.3s ease',
                     '&:hover': {
                       borderColor: 'brand.400',
-                      boxShadow: '0 4px 12px rgba(0, 136, 255, 0.25)',
+                      boxShadow: '0 2px 8px rgba(0, 136, 255, 0.25)',
                     },
                   }}
                 />
