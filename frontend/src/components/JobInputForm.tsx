@@ -2,7 +2,6 @@
 
 import { useApiClient } from '@/lib/api-client';
 import { Resume } from '@/types';
-import { useCallback } from 'react';
 import {
   Box,
   Button,
@@ -18,7 +17,7 @@ import {
   VStack,
 } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FiBriefcase, FiFileText, FiZap } from 'react-icons/fi';
 import { z } from 'zod';
@@ -50,7 +49,7 @@ export function JobInputForm() {
 
   useEffect(() => {
     fetchResumes();
-  }, [apiClient, fetchResumes]);
+  }, [apiClient]);
 
   const fetchResumes = useCallback(async () => {
     try {

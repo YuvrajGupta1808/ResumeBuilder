@@ -2,9 +2,8 @@
 
 import { useApiClient } from '@/lib/api-client';
 import { Resume } from '@/types';
-import { useCallback } from 'react';
 import { Box, Button, Heading, HStack, Text, VStack } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { FiCalendar, FiEye, FiFileText } from 'react-icons/fi';
 
 export function RecentResumes() {
@@ -16,7 +15,7 @@ export function RecentResumes() {
 
   useEffect(() => {
     fetchResumes();
-  }, [fetchResumes]);
+  }, []);
 
   const fetchResumes = useCallback(async () => {
     try {
