@@ -2,10 +2,9 @@
 
 import { useApiClient } from '@/lib/api-client';
 import { JobHistory } from '@/types';
-import { useCallback } from 'react';
 import { Box, Button, Heading, HStack, Text, VStack } from '@chakra-ui/react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { FiCalendar, FiDownload, FiFileText } from 'react-icons/fi';
 
 export function RecentJobApplications() {
@@ -17,7 +16,7 @@ export function RecentJobApplications() {
 
   useEffect(() => {
     fetchJobApplications();
-  }, [fetchJobApplications]);
+  }, []);
 
   const fetchJobApplications = useCallback(async () => {
     try {
