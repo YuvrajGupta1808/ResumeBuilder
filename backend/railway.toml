@@ -10,5 +10,6 @@ restartPolicyMaxRetries = 10
 
 [env]
 NODE_ENV = "production"
+# Updated health check path to fix deployment issues
 PORT = "3001"
 
