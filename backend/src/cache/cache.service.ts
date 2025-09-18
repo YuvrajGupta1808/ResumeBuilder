@@ -5,34 +5,54 @@ import { createClient, RedisClientType } from 'redis';
 @Injectable()
 export class CacheService {
   private readonly logger = new Logger(CacheService.name);
-  private client: RedisClientType;
+  private client: RedisClientType | null = null;
+  private isConnected = false;
 
   constructor(private configService: ConfigService) {
+    this.initializeRedis();
+  }
+
+  private async initializeRedis() {
     const redisUrl = this.configService.get('REDIS_URL');
 
-    // Convert redis:// to rediss:// for Upstash TLS connection
-    const tlsRedisUrl = redisUrl.startsWith('redis://')
-      ? redisUrl.replace('redis://', 'rediss://')
-      : redisUrl;
+    // Skip Redis if no URL is provided or if we're in development mode without Redis
+    if (!redisUrl || this.configService.get('NODE_ENV') === 'development') {
+      this.logger.warn('Redis not configured or in development mode - caching disabled');
+      return;
+    }
 
-    this.client = createClient({
-      url: tlsRedisUrl,
-    });
+    try {
+      // Convert redis:// to rediss:// for Upstash TLS connection
+      const tlsRedisUrl = redisUrl.startsWith('redis://')
+        ? redisUrl.replace('redis://', 'rediss://')
+        : redisUrl;
 
-    this.client.on('error', err => {
-      this.logger.error('Redis Client Error:', err);
-    });
+      this.client = createClient({
+        url: tlsRedisUrl,
+      });
 
-    this.client.on('connect', () => {
-      this.logger.log('Connected to Redis successfully');
-    });
+      this.client.on('error', err => {
+        this.logger.error('Redis Client Error:', err);
+        this.isConnected = false;
+      });
 
-    this.client.connect().catch(err => {
-      this.logger.error('Failed to connect to Redis:', err);
-    });
+      this.client.on('connect', () => {
+        this.logger.log('Connected to Redis successfully');
+        this.isConnected = true;
+      });
+
+      await this.client.connect();
+    } catch (error) {
+      this.logger.error('Failed to initialize Redis:', error);
+      this.client = null;
+      this.isConnected = false;
+    }
   }
 
   async get(key: string): Promise<string | null> {
+    if (!this.client || !this.isConnected) {
+      return null;
+    }
     try {
       return await this.client.get(key);
     } catch (error) {
@@ -42,6 +62,9 @@ export class CacheService {
   }
 
   async set(key: string, value: string, ttlSeconds?: number): Promise<void> {
+    if (!this.client || !this.isConnected) {
+      return;
+    }
     try {
       if (ttlSeconds) {
         await this.client.setEx(key, ttlSeconds, value);
@@ -54,6 +77,9 @@ export class CacheService {
   }
 
   async del(key: string): Promise<void> {
+    if (!this.client || !this.isConnected) {
+      return;
+    }
     try {
       await this.client.del(key);
     } catch (error) {
@@ -62,6 +88,9 @@ export class CacheService {
   }
 
   async flush(): Promise<void> {
+    if (!this.client || !this.isConnected) {
+      return;
+    }
     try {
       await this.client.flushAll();
     } catch (error) {

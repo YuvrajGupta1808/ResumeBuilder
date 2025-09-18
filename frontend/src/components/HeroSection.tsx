@@ -150,7 +150,7 @@ export function HeroSection() {
                 <FiStar color='#0088ff' size={16} />
               </Box>
               <Text fontSize='sm' fontWeight='600' color='brand.700'>
-                Trusted by 10,000+ job seekers
+                Trusted by, job seekers
               </Text>
             </HStack>
           </Box>
@@ -258,22 +258,7 @@ export function HeroSection() {
                 },
               }}
             >
-              <VStack spacing={2} textAlign='center'>
-                <Text
-                  fontSize={{ base: '3xl', md: '4xl' }}
-                  fontWeight='800'
-                  bg='linear(to-r, brand.500, brand.700)'
-                  bgClip='text'
-                  sx={{
-                    animation: 'countUp 2s ease-out forwards',
-                    '@keyframes countUp': {
-                      from: { opacity: 0, transform: 'translateY(20px)' },
-                      to: { opacity: 1, transform: 'translateY(0)' },
-                    },
-                  }}
-                >
-                  10K+
-                </Text>
+              <VStack spacing={1} textAlign='center'>
                 <Text
                   fontSize={{ base: 'sm', md: 'md' }}
                   color='gray.600'
@@ -285,22 +270,7 @@ export function HeroSection() {
                 </Text>
               </VStack>
 
-              <VStack spacing={2} textAlign='center'>
-                <Text
-                  fontSize={{ base: '3xl', md: '4xl' }}
-                  fontWeight='800'
-                  bg='linear(to-r, success.500, success.600)'
-                  bgClip='text'
-                  sx={{
-                    animation: 'countUp 2s ease-out 0.2s forwards',
-                    '@keyframes countUp': {
-                      from: { opacity: 0, transform: 'translateY(20px)' },
-                      to: { opacity: 1, transform: 'translateY(0)' },
-                    },
-                  }}
-                >
-                  95%
-                </Text>
+              <VStack spacing={1} textAlign='center'>
                 <Text
                   fontSize={{ base: 'sm', md: 'md' }}
                   color='gray.600'
@@ -312,22 +282,7 @@ export function HeroSection() {
                 </Text>
               </VStack>
 
-              <VStack spacing={2} textAlign='center'>
-                <Text
-                  fontSize={{ base: '3xl', md: '4xl' }}
-                  fontWeight='800'
-                  bg='linear(to-r, warning.500, warning.600)'
-                  bgClip='text'
-                  sx={{
-                    animation: 'countUp 2s ease-out 0.4s forwards',
-                    '@keyframes countUp': {
-                      from: { opacity: 0, transform: 'translateY(20px)' },
-                      to: { opacity: 1, transform: 'translateY(0)' },
-                    },
-                  }}
-                >
-                  5min
-                </Text>
+              <VStack spacing={1} textAlign='center'>
                 <Text
                   fontSize={{ base: 'sm', md: 'md' }}
                   color='gray.600'

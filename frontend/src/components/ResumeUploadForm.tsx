@@ -17,10 +17,12 @@ import {
 } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 // PDF extraction will be handled server-side or with a different approach
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useForm } from 'react-hook-form';
-import { FiCheck, FiFile, FiUploadCloud } from 'react-icons/fi';
+import { FiCheck, FiDownload, FiFile, FiUploadCloud } from 'react-icons/fi';
 import { z } from 'zod';
 
 const resumeSchema = z.object({
@@ -36,6 +38,8 @@ export function ResumeUploadForm() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isExtracting, setIsExtracting] = useState(false);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [resumePreview, setResumePreview] = useState<string>('');
   const toast = useToast();
   const borderColor = 'gray.300';
   const apiClient = useApiClient();
@@ -167,6 +171,111 @@ ${extractedText || 'No text could be extracted from this PDF file.'}`;
       }
     },
   });
+
+  // Function to generate PDF from resume content
+  const generateResumePDF = async (title: string, content: string) => {
+    setIsGeneratingPDF(true);
+    try {
+      // Create a temporary div with formatted resume content
+      const tempDiv = document.createElement('div');
+      tempDiv.style.position = 'absolute';
+      tempDiv.style.left = '-9999px';
+      tempDiv.style.top = '0';
+      tempDiv.style.width = '210mm'; // A4 width
+      tempDiv.style.padding = '20mm';
+      tempDiv.style.fontFamily = 'Arial, sans-serif';
+      tempDiv.style.fontSize = '12px';
+      tempDiv.style.lineHeight = '1.4';
+      tempDiv.style.color = '#333';
+      tempDiv.style.backgroundColor = 'white';
+      
+      // Format the content for better PDF appearance
+      const formattedContent = content
+        .replace(/\n\n/g, '</p><p>')
+        .replace(/\n/g, '<br>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>');
+      
+      tempDiv.innerHTML = `
+        <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 20px;">
+          <h1 style="font-size: 24px; font-weight: bold; margin: 0; color: #333;">${title}</h1>
+        </div>
+        <div style="white-space: pre-wrap; line-height: 1.6;">
+          <p>${formattedContent}</p>
+        </div>
+      `;
+      
+      document.body.appendChild(tempDiv);
+      
+      // Generate PDF using html2canvas and jsPDF
+      const canvas = await html2canvas(tempDiv, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        width: tempDiv.offsetWidth,
+        height: tempDiv.offsetHeight,
+      });
+      
+      document.body.removeChild(tempDiv);
+      
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      
+      const imgWidth = 210; // A4 width in mm
+      const pageHeight = 295; // A4 height in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      
+      let position = 0;
+      
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+      
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+      
+      // Download the PDF
+      const fileName = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_resume.pdf`;
+      pdf.save(fileName);
+      
+      toast({
+        title: 'PDF Generated Successfully!',
+        description: `Resume PDF "${fileName}" has been downloaded.`,
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+      
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      toast({
+        title: 'PDF Generation Failed',
+        description: 'Could not generate PDF. Please try again.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  };
+
+  // Function to preview resume content
+  const previewResume = (title: string, content: string) => {
+    setResumePreview(content);
+    toast({
+      title: 'Resume Preview',
+      description: 'Scroll down to see your formatted resume preview.',
+      status: 'info',
+      duration: 3000,
+      isClosable: true,
+    });
+  };
 
   const testApiConnection = async () => {
     console.log('=== Testing API Connection ===');
@@ -501,39 +610,167 @@ Software Engineer | ABC Company | 2020-Present
             <FormErrorMessage ml={6} fontSize='sm' fontWeight='500'>
               {errors.content?.message}
             </FormErrorMessage>
+            
+            {/* Preview Button */}
+            <HStack ml={6} mt={4}>
+              <Button
+                size='sm'
+                variant='outline'
+                colorScheme='blue'
+                onClick={() => {
+                  const title = (document.querySelector('input[name="title"]') as HTMLInputElement)?.value || 'Resume';
+                  const content = (document.querySelector('textarea[name="content"]') as HTMLTextAreaElement)?.value || '';
+                  if (content.trim()) {
+                    previewResume(title, content);
+                  } else {
+                    toast({
+                      title: 'No Content',
+                      description: 'Please add resume content before previewing.',
+                      status: 'warning',
+                      duration: 3000,
+                      isClosable: true,
+                    });
+                  }
+                }}
+              >
+                Preview Resume
+              </Button>
+            </HStack>
           </FormControl>
 
-          <Button
-            type='submit'
-            size='lg'
-            isLoading={isUploading}
-            loadingText='Uploading...'
-            h='56px'
-            borderRadius='xl'
-            fontSize='lg'
-            fontWeight='700'
-            bg='linear-gradient(135deg, #0088ff 0%, #0066cc 100%)'
-            color='white'
-            border='none'
-            ml={6}
-            mr={6}
-            sx={{
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                transform: 'translateY(-2px)',
-                boxShadow: '0 12px 32px rgba(0, 136, 255, 0.3)',
-                bg: 'linear-gradient(135deg, #0077ee 0%, #0055bb 100%)',
-              },
-              '&:active': {
-                transform: 'translateY(0px)',
-              },
-            }}
-            leftIcon={<FiUploadCloud size={20} />}
-          >
-            Upload Resume
-          </Button>
+          <HStack spacing={4} ml={6} mr={6}>
+            <Button
+              type='submit'
+              size='lg'
+              isLoading={isUploading}
+              loadingText='Uploading...'
+              h='56px'
+              borderRadius='xl'
+              fontSize='lg'
+              fontWeight='700'
+              bg='linear-gradient(135deg, #0088ff 0%, #0066cc 100%)'
+              color='white'
+              border='none'
+              flex={1}
+              sx={{
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 12px 32px rgba(0, 136, 255, 0.3)',
+                  bg: 'linear-gradient(135deg, #0077ee 0%, #0055bb 100%)',
+                },
+                '&:active': {
+                  transform: 'translateY(0px)',
+                },
+              }}
+              leftIcon={<FiUploadCloud size={20} />}
+            >
+              Upload Resume
+            </Button>
+            
+            <Button
+              size='lg'
+              h='56px'
+              borderRadius='xl'
+              fontSize='lg'
+              fontWeight='700'
+              bg='linear-gradient(135deg, #10b981 0%, #059669 100%)'
+              color='white'
+              border='none'
+              isLoading={isGeneratingPDF}
+              loadingText='Generating...'
+              onClick={() => {
+                const formData = new FormData();
+                const title = (document.querySelector('input[name="title"]') as HTMLInputElement)?.value || 'Resume';
+                const content = (document.querySelector('textarea[name="content"]') as HTMLTextAreaElement)?.value || '';
+                if (content.trim()) {
+                  generateResumePDF(title, content);
+                } else {
+                  toast({
+                    title: 'No Content',
+                    description: 'Please add resume content before generating PDF.',
+                    status: 'warning',
+                    duration: 3000,
+                    isClosable: true,
+                  });
+                }
+              }}
+              sx={{
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 12px 32px rgba(16, 185, 129, 0.3)',
+                  bg: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                },
+                '&:active': {
+                  transform: 'translateY(0px)',
+                },
+              }}
+              leftIcon={<FiDownload size={20} />}
+            >
+              Generate PDF
+            </Button>
+          </HStack>
         </VStack>
       </form>
+
+      {/* Resume Preview Section */}
+      {resumePreview && (
+        <Box mt={8} p={6} bg='gray.50' borderRadius='xl' border='1px solid' borderColor='gray.200'>
+          <HStack justify='space-between' mb={4}>
+            <Text fontSize='xl' fontWeight='700' color='gray.800'>
+              Resume Preview
+            </Text>
+            <Button
+              size='sm'
+              colorScheme='blue'
+              variant='outline'
+              onClick={() => {
+                const title = (document.querySelector('input[name="title"]') as HTMLInputElement)?.value || 'Resume';
+                generateResumePDF(title, resumePreview);
+              }}
+              leftIcon={<FiDownload size={16} />}
+            >
+              Download PDF
+            </Button>
+          </HStack>
+          <Box
+            bg='white'
+            p={6}
+            borderRadius='lg'
+            border='1px solid'
+            borderColor='gray.300'
+            maxH='400px'
+            overflowY='auto'
+            sx={{
+              '&::-webkit-scrollbar': {
+                width: '8px',
+              },
+              '&::-webkit-scrollbar-track': {
+                background: '#f1f1f1',
+                borderRadius: '4px',
+              },
+              '&::-webkit-scrollbar-thumb': {
+                background: '#c1c1c1',
+                borderRadius: '4px',
+              },
+              '&::-webkit-scrollbar-thumb:hover': {
+                background: '#a8a8a8',
+              },
+            }}
+          >
+            <Text
+              whiteSpace='pre-wrap'
+              fontFamily='mono'
+              fontSize='sm'
+              lineHeight='1.6'
+              color='gray.700'
+            >
+              {resumePreview}
+            </Text>
+          </Box>
+        </Box>
+      )}
     </Box>
   );
 }

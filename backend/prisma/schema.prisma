@@ -7,8 +7,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 model Account {
@@ -17,12 +17,12 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -65,8 +65,8 @@ model Resume {
   id             String   @id @default(cuid())
   userId         String
   title          String
-  content        String   @db.Text
-  originalContent String  @db.Text
+  content        String
+  originalContent String
   fileName       String?
   fileSize       Int?
   createdAt      DateTime @default(now())
@@ -84,9 +84,9 @@ model JobHistory {
   resumeId       String
   jobTitle       String
   company        String
-  jobDescription String   @db.Text
-  tailoredResume String   @db.Text
-  coverLetter    String   @db.Text
+  jobDescription String
+  tailoredResume String
+  coverLetter    String
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
