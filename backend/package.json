@@ -23,7 +23,8 @@
         "prisma:migrate": "prisma migrate dev",
         "prisma:deploy": "prisma migrate deploy",
         "prisma:studio": "prisma studio",
-        "prisma:seed": "ts-node prisma/seed.ts"
+        "prisma:seed": "ts-node prisma/seed.ts",
+        "test:latex": "node test-latex-conversion.js"
     },
     "dependencies": {
         "@nestjs/common": "^10.0.0",
@@ -35,6 +36,7 @@
         "@nestjs/swagger": "^7.1.17",
         "@nestjs/throttler": "^5.0.1",
         "@prisma/client": "^5.22.0",
+        "axios": "^1.13.2",
         "bcrypt": "^5.1.1",
         "chalk": "^4.1.2",
         "class-transformer": "^0.5.1",
@@ -69,6 +71,7 @@
         "@types/node": "^20.3.1",
         "@types/passport-jwt": "^3.0.13",
         "@types/passport-local": "^1.0.38",
+        "@types/pdf-parse": "^1.1.5",
         "@types/supertest": "^2.0.12",
         "@typescript-eslint/eslint-plugin": "^6.0.0",
         "@typescript-eslint/parser": "^6.0.0",

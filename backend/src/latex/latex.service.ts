@@ -290,13 +290,13 @@ Sincerely,
     parsedData.education = this.formatEducationNew(sectionContents.education);
     parsedData.skills = this.formatSkillsNew(
       sectionContents.skills ||
-        sectionContents.technical ||
-        sectionContents.programming
+      sectionContents.technical ||
+      sectionContents.programming
     );
     parsedData.experience = this.formatExperienceNew(
       sectionContents.experience ||
-        sectionContents.work ||
-        sectionContents.employment
+      sectionContents.work ||
+      sectionContents.employment
     );
     parsedData.projects = this.formatProjectsNew(sectionContents.projects);
 

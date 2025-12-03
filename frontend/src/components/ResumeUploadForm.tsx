@@ -3,17 +3,17 @@
 import { apiConfig } from '@/lib/api';
 import { useApiClient } from '@/lib/api-client';
 import {
-  Box,
-  Button,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  HStack,
-  Input,
-  Text,
-  Textarea,
-  useToast,
-  VStack,
+    Box,
+    Button,
+    FormControl,
+    FormErrorMessage,
+    FormLabel,
+    HStack,
+    Input,
+    Text,
+    Textarea,
+    useToast,
+    VStack,
 } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 // PDF extraction will be handled server-side or with a different approach
@@ -535,6 +535,60 @@ ${extractedText || 'No text could be extracted from this PDF file.'}`;
             </FormErrorMessage>
           </FormControl>
 
+          {/* PDF to LaTeX Conversion Button */}
+          {uploadedFile && uploadedFile.type === 'application/pdf' && (
+            <Box ml={6} mr={6}>
+              <Button
+                size='md'
+                colorScheme='purple'
+                variant='outline'
+                onClick={async () => {
+                  setIsExtracting(true);
+                  try {
+                    const formData = new FormData();
+                    formData.append('file', uploadedFile);
+                    
+                    const response = await apiClient.post('/latex/convert-pdf-to-latex', formData, {
+                      headers: {
+                        'Content-Type': 'multipart/form-data',
+                      },
+                    });
+                    
+                    if (response.data.latex) {
+                      setValue('content', response.data.latex);
+                      toast({
+                        title: 'PDF Converted to LaTeX!',
+                        description: 'Your PDF has been converted to LaTeX format. You can now edit it.',
+                        status: 'success',
+                        duration: 5000,
+                        isClosable: true,
+                      });
+                    }
+                  } catch (error) {
+                    console.error('PDF to LaTeX conversion error:', error);
+                    toast({
+                      title: 'Conversion Failed',
+                      description: 'Could not convert PDF to LaTeX. Please try manual editing.',
+                      status: 'error',
+                      duration: 5000,
+                      isClosable: true,
+                    });
+                  } finally {
+                    setIsExtracting(false);
+                  }
+                }}
+                isLoading={isExtracting}
+                loadingText='Converting to LaTeX...'
+                leftIcon={<FiFile />}
+              >
+                Convert PDF to LaTeX
+              </Button>
+              <Text fontSize='xs' color='gray.500' mt={2}>
+                Convert your uploaded PDF to editable LaTeX format
+              </Text>
+            </Box>
+          )}
+
           <FormControl isInvalid={!!errors.content}>
             <FormLabel
               fontSize='lg'
@@ -636,6 +690,73 @@ Software Engineer | ABC Company | 2020-Present
                 Preview Resume
               </Button>
             </HStack>
+          </FormControl>
+
+          {/* Additional Content Section */}
+          <FormControl>
+            <FormLabel
+              fontSize='lg'
+              fontWeight='700'
+              color='gray.800'
+              mb={4}
+              display='flex'
+              alignItems='center'
+              gap={3}
+              ml={2}
+            >
+              <FiFile size={20} />
+              Additional Content (Optional)
+            </FormLabel>
+            <Text
+              ml={6}
+              fontSize='sm'
+              color='gray.600'
+              mb={4}
+              fontWeight='500'
+              lineHeight='1.6'
+            >
+              Add any additional information, certifications, projects, or achievements that you want to include in your resume.
+            </Text>
+            <Textarea
+              placeholder='Add additional content here...
+
+Examples:
+• Certifications (AWS, Google Cloud, etc.)
+• Side projects or open-source contributions
+• Publications or speaking engagements
+• Awards and recognitions
+• Volunteer work
+• Languages spoken
+• Additional skills or hobbies'
+              rows={8}
+              borderRadius='xl'
+              border='2px solid'
+              borderColor='gray.200'
+              bg='white'
+              ml={6}
+              mr={6}
+              px={6}
+              py={4}
+              width={'85%'}
+              _hover={{
+                borderColor: 'brand.300',
+              }}
+              _focus={{
+                borderColor: 'brand.400',
+                boxShadow: '0 0 0 3px rgba(0, 136, 255, 0.1)',
+              }}
+              fontSize='md'
+              fontWeight='500'
+              resize='vertical'
+              minH='200px'
+              _placeholder={{
+                color: 'gray.400',
+                fontSize: 'sm',
+                lineHeight: '1.5',
+              }}
+              id="additionalContent"
+              name="additionalContent"
+            />
           </FormControl>
 
           <HStack spacing={4} ml={6} mr={6}>

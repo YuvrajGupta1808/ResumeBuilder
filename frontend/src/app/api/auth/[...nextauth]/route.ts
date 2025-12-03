@@ -20,29 +20,61 @@ const handler = NextAuth({
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        // For demo purposes, accept any email/password combination
-        // In production, you would validate against your backend API
-        if (credentials?.email && credentials?.password) {
-          return {
-            id: '1',
-            email: credentials.email,
-            name: credentials.email.split('@')[0],
-          };
+        try {
+          if (!credentials?.email) {
+            return null;
+          }
+
+          // Call backend API to register/login user
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+          const response = await fetch(`${apiUrl}/api/v1/auth/register`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              email: credentials.email,
+              name: credentials.email.split('@')[0],
+            }),
+          });
+
+          if (!response.ok) {
+            console.error('Backend auth failed:', await response.text());
+            return null;
+          }
+
+          const data = await response.json();
+
+          if (data.user) {
+            return {
+              id: data.user.id,
+              email: data.user.email,
+              name: data.user.name || credentials.email.split('@')[0],
+              image: data.user.image,
+              accessToken: data.access_token,
+            };
+          }
+
+          return null;
+        } catch (error) {
+          console.error('Auth error:', error);
+          return null;
         }
-        return null;
       },
     }),
   ],
   callbacks: {
     session: async ({ session, token }) => {
-      if (session?.user && token?.sub) {
-        session.user.id = token.sub;
+      if (session?.user) {
+        session.user.id = token.sub as string;
+        session.user.accessToken = token.accessToken as string;
       }
       return session;
     },
     jwt: async ({ user, token }) => {
       if (user) {
         token.uid = user.id;
+        token.accessToken = (user as any).accessToken;
       }
       return token;
     },

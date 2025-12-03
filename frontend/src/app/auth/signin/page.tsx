@@ -1,21 +1,21 @@
 'use client';
 
 import {
-  Alert,
-  AlertIcon,
-  Box,
-  Button,
-  Card,
-  CardBody,
-  Container,
-  Divider,
-  FormControl,
-  FormLabel,
-  Heading,
-  HStack,
-  Input,
-  Text,
-  VStack,
+    Alert,
+    AlertIcon,
+    Box,
+    Button,
+    Card,
+    CardBody,
+    Container,
+    Divider,
+    FormControl,
+    FormLabel,
+    Heading,
+    HStack,
+    Input,
+    Text,
+    VStack,
 } from '@chakra-ui/react';
 import { getSession, signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
@@ -33,23 +33,32 @@ export default function SignIn() {
     setIsLoading(true);
     setError('');
 
+    if (!email) {
+      setError('Please enter your email');
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const result = await signIn('credentials', {
         email,
-        password,
+        password: password || 'demo', // Use 'demo' as default password for demo mode
         redirect: false,
       });
 
       if (result?.error) {
-        setError('Invalid credentials');
+        setError('Failed to sign in. Please try again.');
       } else {
         // Check if we have a session
         const session = await getSession();
         if (session) {
-          router.push('/');
+          router.push('/dashboard');
+        } else {
+          setError('Session not created. Please try again.');
         }
       }
     } catch (err) {
+      console.error('Sign in error:', err);
       setError('An error occurred during sign in');
     } finally {
       setIsLoading(false);
@@ -128,13 +137,13 @@ export default function SignIn() {
                   />
                 </FormControl>
 
-                <FormControl isRequired>
-                  <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <FormLabel>Password (Optional for Demo)</FormLabel>
                   <Input
                     type='password'
                     value={password}
                     onChange={e => setPassword(e.target.value)}
-                    placeholder='Enter your password'
+                    placeholder='Enter your password (optional)'
                   />
                 </FormControl>
 
@@ -151,9 +160,12 @@ export default function SignIn() {
               </VStack>
             </Box>
 
-            <Box textAlign='center'>
-              <Text fontSize='sm' color='gray.600'>
-                Demo: Use any email and password to sign in
+            <Box textAlign='center' bg='blue.50' p={4} borderRadius='lg'>
+              <Text fontSize='sm' color='blue.700' fontWeight='600'>
+                🎯 Demo Mode: Just enter any email to sign in!
+              </Text>
+              <Text fontSize='xs' color='blue.600' mt={1}>
+                Password is optional - we'll create an account for you automatically
               </Text>
             </Box>
           </VStack>

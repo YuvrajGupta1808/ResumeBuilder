@@ -198,18 +198,23 @@ export function Navbar() {
                 transition='all 0.2s ease'
               >
                 <Avatar
-                  size={'xs'}
-                  w='40px'
-                  h='40px'
-                  src={session.user?.image || ''}
-                  border='1px solid'
+                  w='56px'
+                  h='56px'
+                  name={session.user?.name || session.user?.email || 'User'}
+                  src={session.user?.image || undefined}
+                  bg='linear-gradient(135deg, #0088ff 0%, #005899 100%)'
+                  color='white'
+                  border='2px solid'
                   borderColor='brand.200'
-                  boxShadow='0 1px 4px rgba(0, 136, 255, 0.15)'
+                  boxShadow='0 2px 8px rgba(0, 136, 255, 0.2)'
+                  fontWeight='600'
+                  fontSize='lg'
                   sx={{
                     transition: 'all 0.3s ease',
                     '&:hover': {
                       borderColor: 'brand.400',
-                      boxShadow: '0 2px 8px rgba(0, 136, 255, 0.25)',
+                      boxShadow: '0 4px 12px rgba(0, 136, 255, 0.3)',
+                      transform: 'scale(1.05)',
                     },
                   }}
                 />
@@ -321,13 +326,26 @@ export function Navbar() {
             {/* Mobile Auth Section */}
             <Box pt={4} borderTop='1px' borderColor='gray.100'>
               {session ? (
-                <VStack spacing={3} align='center'>
-                  <ChakraText fontWeight='700' fontSize='md' color='gray.900'>
-                    {session.user?.name}
-                  </ChakraText>
-                  <ChakraText fontSize='sm' color='gray.600'>
-                    {session.user?.email}
-                  </ChakraText>
+                <VStack spacing={4} align='center'>
+                  <Avatar
+                    size='xl'
+                    name={session.user?.name || session.user?.email || 'User'}
+                    src={session.user?.image || undefined}
+                    bg='linear-gradient(135deg, #0088ff 0%, #005899 100%)'
+                    color='white'
+                    border='2px solid'
+                    borderColor='brand.200'
+                    boxShadow='0 2px 8px rgba(0, 136, 255, 0.2)'
+                    fontWeight='600'
+                  />
+                  <VStack spacing={1}>
+                    <ChakraText fontWeight='700' fontSize='md' color='gray.900'>
+                      {session.user?.name}
+                    </ChakraText>
+                    <ChakraText fontSize='sm' color='gray.600'>
+                      {session.user?.email}
+                    </ChakraText>
+                  </VStack>
                   <Button
                     variant='outline'
                     size='md'

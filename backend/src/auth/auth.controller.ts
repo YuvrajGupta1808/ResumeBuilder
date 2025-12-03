@@ -19,7 +19,7 @@ export class AuthController {
   constructor(
     private authService: AuthService,
     private userService: UserService
-  ) {}
+  ) { }
 
   @Post('login')
   @ApiOperation({ summary: 'Login user' })
@@ -32,20 +32,12 @@ export class AuthController {
   }
 
   @Post('register')
-  @ApiOperation({ summary: 'Register new user' })
+  @ApiOperation({ summary: 'Register new user or login existing user' })
   async register(@Body() createUserDto: CreateUserDto) {
-    // Check if user already exists
-    const existingUser = await this.userService.findByEmail(
-      createUserDto.email
-    );
-    if (existingUser) {
-      // If user exists, just log them in (for OAuth flow)
-      return this.authService.login(existingUser);
-    }
-
-    // Create new user
-    const newUser = await this.userService.create(createUserDto);
-    return this.authService.login(newUser);
+    // Use upsert to handle both new and existing users
+    // This prevents duplicate key errors and works for demo mode
+    const user = await this.userService.upsert(createUserDto);
+    return this.authService.login(user);
   }
 
   @Get('profile')
